@@ -1,0 +1,95 @@
+h2 {
+    padding-top: 100px;  /* Increases vertical spacing from the top */
+    padding-left: 320px;  /* Adds horizontal spacing from the left */
+    color: #007bff;  
+    font-size: 24px;  
+    font-weight: bold;  
+    padding-bottom: 10px;  
+      
+    width: fit-content;  
+    margin-bottom: 20px;  
+ }
+ 
+ 
+ 
+     body, html {
+     margin: 8px;
+     padding: 0;
+     font-family: Arial, sans-serif;
+     color: #333;
+ }
+ 
+ .navbar {
+     background-color: #333;
+     color: white;
+     padding: 10px 20px;
+     position: fixed;
+     width: 100%;
+     z-index: 2; /* Makes sure the navbar is on top */
+     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+ }
+ 
+ .sidebar {
+     position: fixed;
+     top: 110px;
+     left: 0;
+     width: 180px;
+     height: 100%;
+     background-color: #f1f1f1;
+     padding: 20px;
+ }
+ 
+ 
+ .sidebar h1 {
+   margin-top: 0;
+ }
+ 
+ .sidebar ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+ }
+ 
+ .sidebar ul li {
+   margin-bottom: 10px;
+ }
+ 
+ .sidebar ul li a {
+   display: block;
+   padding: 10px;
+   background-color: #ddd;
+   color: #333;
+   text-decoration: none;
+ }
+ 
+ .sidebar ul li a:hover {
+   background-color: #ccc;
+ }
+ 
+ .content {
+     margin-left: 220px; /* width of the sidebar + padding */
+     padding: 20px;
+     margin-top: 70px; /* height of the navbar + padding */
+ }
+ 
+ table {
+     border-collapse: collapse;
+     width: 100%;
+     margin-bottom: 1rem;
+     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+ }
+ 
+ th {
+     background-color: #007bff;
+     color: #fff;
+     padding: 0.5rem;
+     text-align: left;
+ }
+ 
+ tr {
+     border-bottom: 1px solid #ccc;
+ }
+ 
+ td {
+     padding: 0.5rem;
+ }
