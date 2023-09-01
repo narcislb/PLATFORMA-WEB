@@ -14,7 +14,7 @@ if ($_SESSION['user_type'] == 'client') {
 } else if ($_SESSION['user_type'] == 'firma') {
     header("Location: firme-login-form.php");
 } else {
-    header("Location: ../index.html");
+    header("Location: ../index.php");
 }
 exit;
 ?>

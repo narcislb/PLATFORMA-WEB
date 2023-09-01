@@ -47,7 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_SESSION['user_type'] = 'client'; // folosit pentru a seta dacă utilizatorul este firmă sau client
     $_SESSION['username'] =$user['email'];
 
-    header('Location: profil_client.php?username=' . $user['email']);
+
+    if (isset($_POST['redirect']) && !empty($_POST['redirect'])) {
+        header('Location: ' . $_POST['redirect']);
+    } else {
+        header('Location: profil_client.php?username=' . $user['email']);
+    }
     exit;
+    
+
+    
+    
 }
 

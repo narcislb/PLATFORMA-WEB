@@ -1,4 +1,7 @@
-﻿header {
+﻿@import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
+
+
+header {
     background-color: #333;
     color: #fff;
     padding: 1rem;
@@ -125,4 +128,34 @@ body {
     margin-bottom: 10px;
 }
 
+#search-results-container {
+    position: absolute;
+    top:10%; /* Position it right below the search box */
+    right: 0;   /* Align it to the right of the search box's container */
+    width: 250px;  /* Adjust width as needed */
+    z-index: 10;  /* Place it above other content */
+    background-color: #121111;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 400px;
+}
+
+
+.cart-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+  }
+  
+  .cart-item-count {
+    position: absolute;
+    top: -5px; 
+    right: -10px;
+    background-color: red;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 50%; 
+    font-size: 12px;
+  }
 

@@ -1,3 +1,5 @@
+
+@import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
 /* General Resets and Basic Styles */
 
 body, html {
@@ -15,71 +17,132 @@ a {
 
 .navbar {
     background-color: #333;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+  }
 
 /* Header and Navigation */
 
 header {
-    background-color: #555;
+    background-color: #333;
     color: #fff;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
-}
-
-nav ul {
+  }
+  
+  
+  nav ul {
     display: flex;
     list-style-type: none;
-}
-
-nav li {
-    margin: 0 1rem;
-}
-
-nav a {
+  }
+  
+  nav li {
+    margin: 0 0.5rem;
+  }
+  
+  nav a {
     color: #fff;
-    padding: 0.5rem;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-nav a:hover {
-    background-color: #777;
-}
-
-/* Dropdown Functionality */
-
-.dropdown {
+    text-decoration: none;
+  }
+  
+  main {
+    max-width: 960px;
+    margin: 2rem auto;
+    text-align: center;
+  }
+  
+  button {
+    background-color: #ff6a00;
+    color: #fff;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  form button {
+    margin-top: 20px;
+    
+  }
+  
+    button:hover {
+        background-color: #666;
+    }
+  .dropdown {
     position: relative;
-}
-
-.dropdown-content {
+    display: inline-block;
+    margin: 0 0.5rem;
+  }
+  
+  .dropdown-content {
     display: none;
     position: absolute;
-    top: 100%;
-    background-color: #555;
     z-index: 1;
-    border-top: 2px solid #777;
-}
-
-.dropdown:hover .dropdown-content {
+    background-color: white;
+    color: black;
+    min-width: 160px;
+  }
+  
+  .dropdown:hover .dropdown-content {
     display: block;
-}
-
-.dropdown-content a {
+  }
+  
+  .dropbtn {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+    .dropdown-content a:hover {
+        background-color: black;
+        color: white;
+        
+    }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    margin: 0 auto;
+  }
+  
+  label {
+    margin-bottom: 10px;
+  }
+  
+  input[type="submit"] {
+    margin-top: 10px;
+  }
+  
+  .navbar {
+    background-color: #333;
     color: white;
     padding: 10px;
+  }
+  
+  body {
     display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #777;
-}
+    margin: 8px;
+  }
 
 /* Product Listings */
 
@@ -110,17 +173,9 @@ nav a:hover {
 
 
 
-/* Buttons */
 
-button {
-    background-color: #ff6a00;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+
+
 
 button:hover {
     background-color: #ff8a30;
@@ -128,7 +183,179 @@ button:hover {
 
 /* Forms and Filters */
 
-form {
+
+
+
+#search-results-container {
+    position: absolute;
+    top:10%; /* Position it right below the search box */
+    right: 0;   /* Align it to the right of the search box's container */
+    width: 250px;  /* Adjust width as needed */
+    z-index: 10;  /* Place it above other content */
+    background-color: #121111;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 400px;
+}
+
+.account-button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 12px 24px; /* Some padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it a block element */
+    font-size: 16px; /* Increase font size */
+    margin-right: 10px; /* Add some margin to the right */
+  }
+  
+  .logout-button {
+    background-color: #f44336; /* Red background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 12px 24px; /* Some padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it a block element */
+    font-size: 16px; /* Increase font size */
+  }
+  
+   
+  .navbar h1 {
+    margin: 0;
+  }
+  
+  /* Content styles */
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  #searchFirma {
+    width: 300px;
+    height: 30px;
+    margin-bottom: 20px;
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  #suggestions {
+    width: 300px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: #fff;
+  }
+  
+  #suggestions div {
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  #suggestions div:hover {
+    background-color: #f2f2f2;
+  }
+  
+  #recenzie {
+    width: 300px;
+    height: 200px;
+    margin-bottom: 20px;
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  
+  /* produs.php */
+
+ 
+
+
+.slider {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    overflow: hidden;
+    display: inline-flex;
+}
+
+.slide img {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;  /* This ensures that images are resized to fit the container while maintaining their aspect ratio */
+}
+
+
+
+.slide {
+    display: none;
+    width: 100%;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+
+.description {
+    /* Display & Box Model */
+    display: block; /* Make sure it's a block element */
+    width: 80%; /* Taking 80% of the parent container's width */
+    max-width: 800px; /* Max width can be adjusted */
+    margin: 20px auto; /* Centers the block, with 20px vertical space */
     padding: 20px;
-    text-align: center;
+
+    /* Typography */
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    font-family: Arial, sans-serif;
+
+    /* Background & Border */
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    /* Box Shadow */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+
+    /* If content inside is too long */
+    overflow-y: auto;
+    max-height: 400px; /* Adjust as needed */
+}
+
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.cart-item-count {
+  position: absolute;
+  top: -5px; 
+  right: -10px;
+  background-color: red;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 50%; 
+  font-size: 12px;
 }

@@ -1,6 +1,13 @@
 <?php
 session_start();
 
+
+if (!isset($_SESSION['user_type']) || ($_SESSION['user_type'] !== 'client' && $_SESSION['user_type'] !== 'firma')) {
+    echo "<script>alert('Va rugam sa va autentificati');</script>";
+    header('Location: ../index.php'); 
+    exit;
+}
+
 // Connect to the database
 $servername = "localhost";
 $db_username = "root";
@@ -11,6 +18,8 @@ $conn = new mysqli($servername, $db_username, $db_password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+
 
 $firma_id = $_GET['id_firma']; // Get the business ID from the URL
 $client_id = $_SESSION['user_id']; // Get the client ID from the session

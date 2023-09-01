@@ -1,6 +1,16 @@
 <?php
 session_start();
 
+
+if (!isset($_SESSION['user_type']) || ($_SESSION['user_type'] !== 'client' && $_SESSION['user_type'] !== 'firma')) {
+    echo "<script>alert('Va rugam sa va autentificati');</script>";
+    header('Location: ../index.php'); 
+    exit;
+}
+
+
+
+
 // Connect to the database
 $servername = "localhost";
 $db_username = "root";
@@ -60,7 +70,7 @@ $stmt->execute();
 <html>
 <head>
     <title>Platforma SolarQuery</title>
-    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/messenger.css">
     
 
 
@@ -214,6 +224,7 @@ function fetchResults_simple() {
                 // On click, populate the search bar with the firm's name and hide the results
                 firmaDiv.onclick = function() {
                     document.getElementById('search-box-2').value = firma.nume_firma;
+                    document.getElementById('selectedFirmaId').value = firma.id;  
                     resultsContainer.innerHTML = ''; 
                  };
                 

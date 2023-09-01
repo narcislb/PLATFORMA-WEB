@@ -24,11 +24,123 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
 
     ?>
 
+
 <body>
-    <!-- Navbar -->
-<div class="navbar">
-  <h1>My Page</h1>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="../CSS/afisare_comenzi.css">
+</head>
+<body>
+    <header>
+        <h1><a href="../index.php">SolarQuery Home</a></h1>
+        <nav>
+            <ul>
+                <li><a href="#">Acasă</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Shop</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/produse.html">Produse</a>
+                        <a href="HTML/servicii.html">Servicii</a>
+                    </div>
+                </li>
+                <li><a href="#">Despre noi</a></li>
+                <li><a href="#">Contact</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Clienti</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/clienti-register.html">Înregistrare</a>
+                        <a href="PHP/clienti-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Furnizori</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/firme-register.html">Înregistrare</a>
+                        <a href="PHP/firme-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="button"><a href="../ADD_RECENZIE/adaugare_recenzie.php">Lasa o recenzie</a></li>
+                <li class="search-container">
+                    <!-- Formularul de căutare -->
+                    <form method="GET">
+                        <input type="text" class="search-box" id="search-box" name="termen_cautare" placeholder="Caută o firmă..." onkeyup="fetchResults()">
+                        <div id="search-results-container"></div>
+                    </form>
+                </li>
+                
+                <div class="cart-icon-container">
+                        <a href="cos-cumparaturi.php">
+                             <i class="fas fa-shopping-cart"></i> 
+                                    <span class="cart-item-count">
+                            <?php 
+                        if(isset($_SESSION['cos-cumparaturi']) && is_array($_SESSION['cos-cumparaturi'])) {
+                            echo array_sum($_SESSION['cos-cumparaturi']); 
+                        } else {
+                            echo 0;
+                        }
+                            ?>
+                            </span>
+                        </a>
+                    </div>
+
+            </ul>
+           
+             <div>                 
+            <?php if(isset($_SESSION['user_id'])): ?>
+  <?php if($_SESSION['user_type'] == 'client'): ?>
+    <a href="../PHP/profil_client.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php elseif ($_SESSION['user_type'] == 'firma'): ?>  
+    <a href="../PHP/firme-dashboard.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php endif; ?>
+<?php endif; ?>
+  </div>       
+              
+
+        </nav>
+
+    </header>
+
+    <script>
+    function fetchResults() {
+        let query = document.getElementById('search-box').value;
+     // Check if the query is empty or not
+     if (query.trim() === '') {
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
+    }
+        // Efectuăm un request AJAX către scriptul PHP
+        fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
+        .then(response => response.json())
+        .then(data => {
+            let resultsContainer = document.getElementById('search-results-container');
+            resultsContainer.innerHTML = ''; // Resetează containerul
+    
+            if (data.length > 0) {
+                data.forEach(firma => {
+                    let firmaDiv = document.createElement('div');
+                    let firmaLink = document.createElement('a');
+                    firmaLink.href = '../PHP/profil_firma_copy.php?id=' + firma.id;
+                    firmaLink.textContent = firma.nume_firma;
+    
+                    firmaDiv.appendChild(firmaLink);
+                    resultsContainer.appendChild(firmaDiv);
+                });
+            } else {
+                resultsContainer.innerHTML = 'Niciun rezultat găsit.';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+
+    </script>
 
 <!-- Sidebar -->
 <div class="sidebar">
@@ -37,19 +149,20 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
   </a>
     <ul>
       <li><a href="firme_afisare_comenzi.php">Comenzi</a></li>
-       <li><a href="adaugare_adresa_client.php">Adrese si date personale</a></li>
+       <li><a href="adaugare_date_firma.php">Informatii firma</a></li>
        <li><a href="firme_adaugare_produs.php">Adaugare produse</a></li>
-       <li><a href="firme-produse.php">Produse si servicii</a></li>
+       <li><a href="firme_afiasare_produse.php">Produse si servicii</a></li>
+       <li><a href="../CHAT/messenger.php">Messenger</a></li>
        <li><a href="logout.php">Logout</a></li>
        
     </ul>
   </div>
-<body>
+
 
     <!-- afiseaza comenzile           -->
   
 
-    <h2>Comenzile primite:</h2>
+    <h2 style='margin-left: 300px; margin-top: 95px;'>Comenzile primite:</h2>
 
     
       <?php
@@ -73,34 +186,65 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
    }
 
    $result = $conn->query($sql);
+   $idclient = null; // Initialize the variable outside the loop
 ?>
+
+
+
+<!-- TABEL PRINCIPAL AFISARE COMENZI -->
 
 <table style="margin-left: 300px;margin-top: 95px;">
     <thead>
         <tr>
-            <th><a href="?sort=id_comanda&direction=<?php echo ($currentSort === 'id_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">ID comanda</a></th>
-            <th><a href="?sort=data_comanda&direction=<?php echo ($currentSort === 'data_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Data comanda</a></th>
-            <th><a href="?sort=id_adresa_livrare&direction=<?php echo ($currentSort === 'id_adresa_livrare' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Id adresa livrare</a></th>
-            <th><a href="?sort=status_comanda&direction=<?php echo ($currentSort === 'status_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Status comanda</a></th>
+            <th ><a href="?sort=id_comanda&direction=<?php echo ($currentSort === 'id_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">ID comanda</a></th>
+            <th ><a href="?sort=data_comanda&direction=<?php echo ($currentSort === 'data_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Data comanda</a></th>
+            <th ><a href="?sort=id_adresa_livrare&direction=<?php echo ($currentSort === 'id_adresa_livrare' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Id adresa livrare</a></th>
+
+            <th ><a href="?sort=tip_facturare&direction=<?php echo ($currentSort === 'tip_facturare' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Tip facturare</a></th>
+            <th ><a href="?sort=status_comanda&direction=<?php echo ($currentSort === 'status_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Status comanda</a></th>
         </tr>
     </thead>
     <tbody>
+   
 <?php
+
    if ($result->num_rows > 0) {
        while($row = $result->fetch_assoc()) {
            echo "<tr>";
            echo "<td><a href='?order_id=" . $row["id_comanda"] . "'>" . $row["id_comanda"] . "</a></td>";
+           echo "<td>" . $row["data_comanda"] . "</td>";
+        
+
+           echo "<td><a href='?show_address=" . $row["id_adresa_livrare"] . "'>" . $row["id_adresa_livrare"] . "</a></td>";
+
+            // Determine which link to show based on tip_facturare
+    if($row["tip_facturare"] == "persoana_fizica") {
+        echo "<td><a href='?show_address=" . $row["id_adresa_livrare"] . "'>persoana_fizica</a></td>";
+
+    } else if($row["tip_facturare"] == "persoana_juridica") {
+        echo "<td><a href='?show_juridica_address=" . $row["id_adresa_livrare"] . "'>persoana_juridica</a></td>";
+        $idclient=$row["id_client"];
+    } 
+           
+
 
            echo "<td>" . $row["data_comanda"] . "</td>";
-           echo "<td>" . $row["id_adresa_livrare"] . "</td>";
+
            echo "<td>" . $row["status_comanda"] . "</td>";
            echo "</tr>";
-       }
+       
+       
+       
+       
+       
+       
+        }
    } else {
        echo "<tr><td colspan='4'>Nu există comenzi.</td></tr>";
    }
 
    ?>
+
    </tbody>
 </table>
 
@@ -125,6 +269,8 @@ $productsSql = "
 
 
    
+// tabel cu produsele comenzii
+// Dacă există produse pentru comanda selectată, afisare într-un tabel
 
    if (isset($productsResult) && $productsResult->num_rows > 0) {
     
@@ -146,6 +292,8 @@ $productsSql = "
     echo "</tbody>";
     echo "</table>";
 }
+
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['order_id_input']) && isset($_POST['new_status'])) {
     $order_id_input = $_POST['order_id_input'];
@@ -190,6 +338,96 @@ echo "</form>";
 
 
 
+
+
+if(isset($_GET['show_address'])) {
+    $address_id = $_GET['show_address'];
+
+    // Fetch address details
+    $addressSql = "SELECT * FROM tbl_adrese WHERE id_adresa = ?";
+    $stmt = $conn->prepare($addressSql);
+    $stmt->bind_param("i", $address_id);
+    $stmt->execute();
+    $addressResult = $stmt->get_result();
+    
+    if ($address = $addressResult->fetch_assoc()) {
+        echo "<h3>Detalii Adresa:</h3>";
+        echo "<table style='margin-left: 300px; margin-top: 95px;'>";
+        echo "<tr><th>Tara</th><th>Judet</th><th>Localitate</th><th>Adresa</th><th>Cod Postal</th><th>Telefon</th><th>Nume</th></tr>";
+        echo "<tr>";
+        echo "<td>" . $address["tara"] . "</td>";
+        echo "<td>" . $address["judet"] . "</td>";
+        echo "<td>" . $address["localitate"] . "</td>";
+        echo "<td>" . $address["adresa"] . "</td>";
+        echo "<td>" . $address["cod_postal"] . "</td>";
+        echo "<td>" . $address["telefon"] . "</td>";
+        echo "<td>" . $address["nume"] . "</td>";
+        echo "</tr>";
+        echo "</table>";
+    } else {
+        echo "<p>Nu există detalii pentru adresa selectată.</p>";
+    }
+}
+
+
+if(isset($_GET['show_juridica_address'])) {
+    
+    
+    // // First, retrieve the ID for the client based on the order ID
+    // $orderSql = "SELECT id_client FROM tbl_comenzi WHERE id_comanda = ?";
+    // $stmt = $conn->prepare($orderSql);
+    // $stmt->bind_param("i", $order_id);
+    // $stmt->execute();
+    // $result = $stmt->get_result();
+    // $order = $result->fetch_assoc();
+    // $id_client = $order['id_client'];
+    // $stmt->close();
+
+    // Second, with the client ID, get the persoana juridica ID
+    $clientSql = "SELECT persoana_juridica_id FROM tbl_clienti WHERE id = ?";
+    $stmt = $conn->prepare($clientSql);
+    $stmt->bind_param("i", $idclient);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $client = $result->fetch_assoc();
+    $persoana_juridica_id = $client['persoana_juridica_id'];
+    $stmt->close();
+
+    // Now, with persoana juridica ID, you can query tbl_date_persoana_juridica
+    // to get details like nume_companie, CUI, etc.
+
+    $detailsSql = "SELECT nume_companie, CUI, NumarRegCom, SediuSocial
+                   FROM tbl_date_persoana_juridica 
+                   WHERE id = ?";
+    $stmt = $conn->prepare($detailsSql);
+    $stmt->bind_param("i", $persoana_juridica_id);
+    $stmt->execute();
+    $detailsResult = $stmt->get_result();
+    
+    if ($details = $detailsResult->fetch_assoc()) {
+        echo "<h3>Detalii Persoana Juridica:</h3>";
+        echo "<table style='margin-left: 300px; margin-top: 95px;'>";
+        echo "<tr><th>Nume Companie</th><th>CUI</th><th>Numar Inregistrare</th><th>Sediu Social</th></tr>";
+        echo "<tr>";
+        echo "<td>" . $details["nume_companie"] . "</td>";
+        echo "<td>" . $details["CUI"] . "</td>";
+        echo "<td>" . $details["NumarRegCom"] . "</td>";
+        echo "<td>" . $details["SediuSocial"] . "</td>";
+        echo "</tr>";
+        echo "</table>";
+    } else {
+        echo "<p>Nu există detalii pentru persoana juridica selectată.</p>";
+    }
+}
+
+
+
+
+
+
+
+
+
 if (isset($feedback)) {
     echo "<p>" . $feedback . "</p>";
 }
@@ -203,5 +441,5 @@ $conn->close();
 <html>
 <head>
   <title>My Page</title>
-  <link rel="stylesheet" type="text/css" href="../CSS/clienti_comenzi.css">
+  <!-- <link rel="stylesheet" type="text/css" href="../CSS/clienti_comenzi.css"> -->
 </head>
