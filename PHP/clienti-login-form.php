@@ -5,7 +5,7 @@ session_start(); // pornește o sesiune
 //verifică dacă utilizatorul este deja autentificat si daca este client
 if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'client') {
     //  utilizatorul este deja autentificat, redirecționează către pagina de profil
-    header('Location: profil_client.php?username=' . $_SESSION['username']);
+    header('Location: profil_client.php');
     exit;
 }
 ?>
@@ -32,7 +32,7 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'client') {
                 <input type="email" id="email" name="email" required>
                 <label for="password">Parolă:</label>
                 <input type="password" id="password" name="password" required>
-
+                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($_GET['redirect'] ?? ''); ?>">
                 <button type="submit">Autentificare</button>
             </form>
             <p>Nu aveți cont? <a href="#">Înregistrați-vă aici</a></p>

@@ -1,6 +1,13 @@
 <?php  
 session_start();
 
+
+if (!isset($_SESSION['user_type']) || ($_SESSION['user_type'] !== 'client' && $_SESSION['user_type'] !== 'firma')) {
+    echo "<script>alert('Va rugam sa va autentificati');</script>";
+    header('Location: ../index.php'); 
+    exit;
+}
+
 // Connect to the database
 $servername = "localhost";
 $db_username = "root";

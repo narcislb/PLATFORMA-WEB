@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_SESSION['cos-cumparaturi'][$id_produs])) {
         // Adăugăm cantitatea la produsul existent în coș
         $_SESSION['cos-cumparaturi'][$id_produs] += $cantitate;
+        
+
     } else {
         // Adăugăm produsul în coș
         $_SESSION['cos-cumparaturi'][$id_produs] = $cantitate;
@@ -31,41 +33,219 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // verifică dacă există un id de produs
+
 if (isset($_GET['id'])) {
-    // caută produsul în baza de date folosind id-ul produsului și returnează rezultatul 
-    $stmt = $db->prepare('SELECT p.*, i.nume_imagine AS imagine FROM tbl_produse p LEFT JOIN tbl_imagini i ON p.id = i.id_produs WHERE p.id  = ?');
-    $stmt->execute([$_GET['id']]);
-    // returnează primul rând din rezultat ca un array asociativ 
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-    // verifică dacă produsul există (array-ul nu este gol)
+    // Fetch the product details
+    $stmt_product = $db->prepare('
+    SELECT tbl_produse.*, tbl_firme.nume_firma 
+    FROM tbl_produse 
+    LEFT JOIN tbl_firme ON tbl_produse.id_firma = tbl_firme.id 
+    WHERE tbl_produse.id = ?
+');
+    $stmt_product->execute([$_GET['id']]);
+    $product = $stmt_product->fetch(PDO::FETCH_ASSOC);
+    
+    // Check if the product exists
     if (!$product) {
-        // Eroare simplă de afișat dacă id-ul produsului nu există (array-ul este gol)
         exit('Produsul nu exista!');
     }
+    
+    // Fetch all images for the product
+    $stmt_images = $db->prepare('SELECT nume_imagine FROM tbl_imagini WHERE id_produs = ?');
+    $stmt_images->execute([$_GET['id']]);
+    $images = $stmt_images->fetchAll(PDO::FETCH_ASSOC);
+    
 } else {
-    // afiseaza o eroare1 dacă nu există id de produs în URL
+    // Error if there's no product ID in the URL
     exit('Produsul nu exista!');
 }
+
+// Now, $product will contain the product details
+// and $images will be an array of images associated with the product
+
 ?>
 <!DOCTYPE html>
 <html>
-<div class="product content-wrapper">
-    <img src="../IMAGES/products/<?=$product['imagine']?>" width="200" height="200" alt="<?=$product['nume_produs']?>">
+
+<head>
+    <title>Lista produse</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../CSS/lista_produse_style.css">
+</head>
+<body>
+<header>
+        <h1><a href="../index.php">SolarQuery Home</a></h1>
+        <nav>
+            <ul>
+                <li><a href="#">Acasă</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Shop</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/produse.html">Produse</a>
+                        <a href="HTML/servicii.html">Servicii</a>
+                    </div>
+                </li>
+                <li><a href="#">Despre noi</a></li>
+                <li><a href="#">Contact</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Clienti</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/clienti-register.html">Înregistrare</a>
+                        <a href="PHP/clienti-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Furnizori</a>
+                    <div class="dropdown-content">
+                        <a href="HTML/firme-register.html">Înregistrare</a>
+                        <a href="PHP/firme-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="button"><a href="../ADD_RECENZIE/adaugare_recenzie.php">Lasa o recenzie</a></li>
+                <li class="search-container">
+                    <!-- Formularul de căutare -->
+                    <form method="GET">
+                        <input type="text" class="search-box" id="search-box" name="termen_cautare" placeholder="Caută o firmă..." onkeyup="fetchResults()">
+                        <div id="search-results-container"></div>
+                    </form>
+                </li>
+                
+            </ul>
+           
+             <div>                 
+            <?php if(isset($_SESSION['user_id'])): ?>
+  <?php if($_SESSION['user_type'] == 'client'): ?>
+    <a href="../PHP/profil_client.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php elseif ($_SESSION['user_type'] == 'firma'): ?>  
+    <a href="../PHP/firme-dashboard.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php endif; ?>
+<?php endif; ?>
+  </div>       
+              
+
+        </nav>
+
+        
+
+    </header>
+
+<!-- script search box -->
+    <script>
+    function fetchResults() {
+        let query = document.getElementById('search-box').value;
+     // Check if the query is empty or not
+     if (query.trim() === '') {
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
+    }
+        // Efectuăm un request AJAX către scriptul PHP
+        fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
+        .then(response => response.json())
+        .then(data => {
+            let resultsContainer = document.getElementById('search-results-container');
+            resultsContainer.innerHTML = ''; // Resetează containerul
+    
+            if (data.length > 0) {
+                data.forEach(firma => {
+                    let firmaDiv = document.createElement('div');
+                    let firmaLink = document.createElement('a');
+                    firmaLink.href = '../PHP/profil_firma_copy.php?id=' + firma.id;
+                    firmaLink.textContent = firma.nume_firma;
+    
+                    firmaDiv.appendChild(firmaLink);
+                    resultsContainer.appendChild(firmaDiv);
+                });
+            } else {
+                resultsContainer.innerHTML = 'Niciun rezultat găsit.';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+
+    </script>
+
+
+
+
+
+
+<div class="product content-wrapper"  style="text-align: center;">
+
+
+      <div class="slider" style="text-align: center;">  
+    <?php if (!empty($images)): ?>
+        <?php foreach ($images as $image): ?>
+            <div class="slide">
+                <img src="../IMAGES/products/<?= $image['nume_imagine'] ?>" width="500" height="500" alt="<?= $product['nume_produs'] ?>">
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <button class="prev" onclick="changeSlide(-1)">❮</button>
+    <button class="next" onclick="changeSlide(1)">❯</button>
+</div>
+
+
+    <!-- <img src="../IMAGES/products/<?=$product['imagine']?>" width="200" height="200" alt="<?=$product['nume_produs']?>"> -->
     <div>
         <h1 class="name"><?=$product['nume_produs']?></h1>
         <span class="price">
-            &dollar;<?=$product['pret_produs']?>
+        <h2>Pret:</h2>
+            <?=$product['pret_produs']?><span> Lei</span>
             
         </span>
-        <form  method="post">
-            <input type="number" name="cantitate" value="1" min="1" max="<?=$product['cantitate']?>" placeholder="Cantitate" required>
-            <input type="hidden" name="id_produs" value="<?=$product['id']?>">
-            <input type="submit" value="Adauga in cos">
-        </form>
+        <h2>Vandut de :</h2>
+            <span><?=$product['nume_firma']?></span>
+
+        <h2>În stoc:</h2>
+        <span><?=$product['cantitate']?></span><span> de unități</span>
+
+
+        <!-- afisare descriere -->
         <div class="description">
+        <h2>Descriere:</h2>
             <?=$product['descriere_produs']?>
         </div>
+
+        <form method="post"                                                                 style="display: flex; flex-direction: column; align-items: center;">
+    <label for="cantitate" style="margin-bottom: 10px;">Cantitate:</label>
+    <input type="number" name="cantitate" value="1" min="1" max="<?=$product['cantitate']?>" placeholder="Cantitate" required style="padding: 5px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px;">
+    <input type="hidden" name="id_produs" value="<?=$product['id']?>">
+    <input type="submit" value="Adauga in cos"            style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        </form>
+       
     </div>
+
+    
+
+<!-- slider script -->
+<script>
+
+let slideIndex = 1;
+showSlide(slideIndex);
+
+function changeSlide(n) {
+    showSlide(slideIndex += n);
+}
+
+function showSlide(n) {
+    let slides = document.querySelectorAll(".slide");
+    if (n > slides.length) { slideIndex = 1 }
+    if (n < 1) { slideIndex = slides.length }
+    for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    slides[slideIndex - 1].style.display = "block";
+}
+
+</script>
+
+
 </div>
 </html>
 

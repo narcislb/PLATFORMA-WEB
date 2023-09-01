@@ -94,10 +94,82 @@ if ($result->num_rows > 0) {
         <!-- Display other firm details as needed -->
         //codul care afissaza #zona in care ofera servicii
         <p><strong>Zona in care ofera servicii:</strong> <?php echo $firma_details['zona']; ?></p>
+        
         <h2>Recenzii:</h2>
+
 <div id="recenzie-display">Asteapta recenzia...</div>
 <button onclick="previousRecenzie()">Anterior</button>
 <button onclick="nextRecenzie()">Următor</button>
+
+        <h2>Portofoliu furnizor:</h2>
+
+        
+        <?php
+
+
+$offset = isset($_GET['offset']) ? (int) $_GET['offset'] : 0;  // We use an offset to determine which portfolio to display.
+
+// Fetch the current portofoliu based on offset
+$query = "SELECT * FROM tbl_portofoliu WHERE id_firma = ? LIMIT 1 OFFSET ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ii", $id_firma, $offset);
+$stmt->execute();
+$current_portofoliu = $stmt->get_result()->fetch_assoc();
+
+if (empty($current_portofoliu)) {
+    $hasPortofoliu = false;
+} else {
+    $hasPortofoliu = true;
+}
+
+// Fetch associated images
+$query = "SELECT * FROM tbl_imagini_portofoliu WHERE id_descriere = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $current_portofoliu['id']);
+$stmt->execute();
+$images = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// Check if there's a next portofoliu entry
+$query = "SELECT * FROM tbl_portofoliu WHERE id_firma = ? LIMIT 1 OFFSET ?";
+$stmt = $conn->prepare($query);
+$offset_plus_one = $offset + 1;
+$stmt->bind_param("ii", $id_firma, $offset_plus_one);
+$stmt->execute();
+$next_portofoliu = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+?>
+
+<!-- HTML part -->
+
+<?php if ($hasPortofoliu): ?>
+
+<h2>Portofoliu cu lucrari : </h2>
+<h2><?php echo $current_portofoliu['titlu']; ?></h2>
+<h2><?php echo $current_portofoliu['descriere']; ?></h2>
+
+<!-- Display images -->
+<?php foreach ($images as $image): ?>
+    <img src="../IMAGES/portofoliu/<?php echo $image['nume_imagine']; ?>" alt="" width="300" height="300" style="object-fit: contain;">
+<?php endforeach; ?>
+
+<!-- Previous button -->
+<?php if ($offset > 0): ?>
+    <a href="portofoliu_furnizor.php?offset=<?php echo $offset - 1; ?>">Previous</a>
+<?php endif; ?>
+
+
+<!-- Next button -->
+<?php if ($next_portofoliu): ?>
+    <a href="portofoliu_furnizor.php?offset=<?php echo $offset + 1; ?>">Next</a>
+<?php endif; ?>
+
+<?php else: ?>
+
+<h3>Nu exista portofoliu</h3>
+
+<?php endif; ?>
 
 
 <!-- Assuming you are inside PHP and have access to the business's ID -->

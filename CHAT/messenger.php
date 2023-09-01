@@ -1,6 +1,14 @@
 <?php
 session_start();
 
+
+if (!isset($_SESSION['user_type']) || ($_SESSION['user_type'] !== 'client' && $_SESSION['user_type'] !== 'firma')) {
+    echo "<script>alert('Va rugam sa va autentificati');</script>";
+    header('Location: ../index.php'); 
+    exit;
+}
+
+
 // Connect to the database
 $servername = "localhost";
 $db_username = "root";
@@ -11,7 +19,6 @@ $conn = new mysqli($servername, $db_username, $db_password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 
 
 $user_id = $_SESSION['user_id']; // This would be set during login
@@ -60,7 +67,7 @@ $stmt->execute();
 <html>
 <head>
     <title>Platforma SolarQuery</title>
-    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/messenger.css">
     
     
 </head>
@@ -105,6 +112,23 @@ $stmt->execute();
                     </form>
                 </li>
                 
+                <div class="cart-icon-container">
+                        <a href="cos-cumparaturi.php">
+                             <i class="fas fa-shopping-cart"></i> 
+                                    <span class="cart-item-count">
+                            <?php 
+                        if(isset($_SESSION['cos-cumparaturi']) && is_array($_SESSION['cos-cumparaturi'])) {
+                            echo array_sum($_SESSION['cos-cumparaturi']); 
+                        } else {
+                            echo 0;
+                        }
+                            ?>
+                            </span>
+                        </a>
+                    </div>
+
+
+
             </ul>
         </nav>
        
@@ -153,10 +177,18 @@ echo '
 
 
    
-   
+    
 
 
 ?>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+
 
 <script>
    
@@ -196,6 +228,7 @@ echo '
     
 
 </script>
+
 
   
     <footer>
