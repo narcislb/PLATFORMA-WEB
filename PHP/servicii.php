@@ -1,67 +1,36 @@
+
 <?php
-session_start(); // pornește o sesiune
 
-// preia datele despre utilizatorul curent
-$username = $_SESSION['username'];
-
-// conectarea la baza de date
-$servername = "localhost";
-$db_username = "root";
-$db_password = "";
-$dbname = "solarquery";
-
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-// Verifică dacă s-a realizat conexiunea la baza de date
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-
-
-//verifică dacă utilizatorul este deja autentificat si daca este client
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'client') {
-  //  utilizatorul nu este  autentificat sau nu este client, redirecționează către pagina de logare
-  header('Location: clienti-login-form.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-exit;
-}
-
-// obtine data inregistrarii clientului
-$query = "SELECT date FROM tbl_clienti WHERE email = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $username); // unde username este emailul clientului
-$stmt->execute();
-$stmt->bind_result($registration_date);
-$stmt->fetch();
-$stmt->close();
-
-
-$now = new DateTime();  // current date
-$registered_date = new DateTime($registration_date);
-$interval = $now->diff($registered_date);
-$days_since_registration = $interval->days;
-
-  
+session_start();
 
 ?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profil client</title>
-  <link rel="stylesheet" type="text/css" href="../CSS/profil_client.css">
+    <title>Servicii</title>
+    <link rel="stylesheet" href="../CSS/produse.css">
+   
+
 </head>
 <body>
-<header>
-<h1><a href="../index.php">SolarQuery</a></h1>
+
+<div class="content-wrapper">
+    <header>
+    <h1><a href="../index.php">SolarQuery</a></h1>
         <nav>
             <ul>
-                <li><a href="#">Acasă</a></li>
+                <li><a href="../index.php">Acasă</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropbtn">Shop</a>
                     <div class="dropdown-content">
-                        <a href="../php/produse.php">Produse</a>
-                        <a href="../php/servicii.php">Servicii</a>
+                        <a href="produse.php">Produse</a>
+                        <a href="servicii.php">Servicii</a>
                     </div>
                 </li>
                 <li><a href="../despre_noi.php">Despre noi</a></li>
@@ -69,16 +38,16 @@ $days_since_registration = $interval->days;
                 <li class="dropdown">
                     <a href="#" class="dropbtn">Clienti</a>
                     <div class="dropdown-content">
-                        <a href="../PHP/clienti-register-form.php">Înregistrare</a>
-                        <a href="../PHP/clienti-login-form.php">Logare</a>
+                        <a href="clienti-register-form.php">Înregistrare</a>
+                        <a href="clienti-login-form.php">Logare</a>
                         
                     </div>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropbtn">Furnizori</a>
                     <div class="dropdown-content">
-                        <a href="../PHP/firme-register-form.php">Înregistrare</a>
-                        <a href="../PHP/firme-login-form.php">Logare</a>
+                        <a href="firme-register-form.php">Înregistrare</a>
+                        <a href="firme-login-form.php">Logare</a>
                         
                     </div>
                 </li>
@@ -91,7 +60,6 @@ $days_since_registration = $interval->days;
                     </form>
                 </li>
                 
-
                 <div class="cart-icon-container">
                         <a href="../PHP/cos-cumparaturi.php">
                              <i class="fas fa-shopping-cart"></i> 
@@ -108,10 +76,8 @@ $days_since_registration = $interval->days;
                     </div>
 
 
-
-
             </ul>
-           
+            
             <div>                 
 <?php if(isset($_SESSION['user_id'])): ?>
   <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'client'): ?>
@@ -127,15 +93,79 @@ $days_since_registration = $interval->days;
 
         </nav>
 
+
+
+        
+
     </header>
 
-    <script>
+
+    <main>
+        <h2>Servicii</h2>
+        <div class="row">
+            <div class="column">
+                <details>
+                    <summary><img src="../IMAGES/servicii_consultanta.jpeg"  class="category-image">Servicii consultanta</summary>
+                    <ul>
+                        <!-- de aici trebuie sa facem un link catre pagina cu produsele din subcategorie -->
+                         <li><a href="../PHP/lista-produse.php?subcategorie=servicii de consultanță și proiectare">servicii de consultanță și proiectare</a></li>
+                         <li><a href="../PHP/lista-produse.php?subcategorie=documentatie prosumator">documentatie prosumator</a></li>
+                         <li><a href="../PHP/lista-produse.php?subcategorie=Consultanta_Altele">Altele</a></li>
+
+                        
+                    </ul>
+                </details>
+            </div>
+            <div class="column">
+                <details>
+                    <summary><img src="../IMAGES/servicii_montaj.jpeg" class="category-image"> Servicii de montaj</summary>
+                    <ul>
+                        <!-- de aici trebuie sa facem un link catre pagina cu produsele din subcategorie -->
+                        <li><a href="../PHP/lista-produse.php?subcategorie=instalare sisteme">instalare sisteme</a></li>
+
+                        <li><a href="../PHP/lista-produse.php?subcategorie=modificare sisteme">modificare sisteme</a></li>
+
+                        <li><a href="../PHP/lista-produse.php?subcategorie=Montaj_Altele">Altele</a></li>
+
+                    </ul>
+                </details>
+            </div>
+            <div class="column">
+                <details>
+                    <summary><img src="../IMAGES/servicii_mentenanta.jpg"  class="category-image"> Servicii de mentenanta</summary>
+                    <ul>
+                    <li><a href="../PHP/lista-produse.php?subcategorie=verificare sisteme">verificare sisteme</a></li>
+
+                    <li><a href="../PHP/lista-produse.php?subcategorie=Mentenanta_Altele">Altele</a></li>
+
+
+                    </ul>
+                </details>
+            </div>
+           
+    </main>
+</body>
+
+
+<footer>
+
+
+<a href="https://ec.europa.eu/consumers/odr/main/index.cfm?event=main.home2.show&lng=RO">
+        <img src="../IMAGES/extra/anpc-sal.webp" alt="Image Description"  />
+    </a >
+
+        <p>&copy;  2023 Platforma SolarQuery</p>
+    </footer>
+
+
+<!-- script search box -->
+<script>
     function fetchResults() {
         let query = document.getElementById('search-box').value;
-     // verifică dacă query-ul nu este gol
+     // Check if the query is empty or not
      if (query.trim() === '') {
-        document.getElementById('search-results-container').innerHTML = ''; // elimină rezultatele anterioare
-        return; // iese din funcție
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -164,28 +194,4 @@ $days_since_registration = $interval->days;
 
     </script>
 
-<!-- Sidebar -->
-<div class="sidebar">
-<a href="profil_client.php" >
-    <h1>Dashboard</h1>
-  </a>
-    <ul>
-      <li><a href="clienti_comenzi.php">Comenzi</a></li>
-       <li><a href="adaugare_adresa_client.php">Adrese si date personale</a></li>
-       <li><a href="adaugare_date_persoana_juridica.php">Date persoana juridica</a></li>
-         <li><a href="../CHAT/messenger.php">Messenger</a></li>
-       <li><a href="logout.php">Logout</a></li>
-       
-    </ul>
-  </div>
-
-<!-- Content box -->
-<div class="content">
-  
-  <h1>Contul meu</h1>
-  <p>Bun venit </p>
-  <p>Iti multumim ca esti client aici de <?= $days_since_registration; ?> zile.</p>
-</div>
-
-</body>
 </html>

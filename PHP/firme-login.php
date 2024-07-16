@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // validare formular
     if (empty($email) || empty($password)) {
         // afișează un mesaj de eroare și redirecționează către pagina de login
-        $_SESSION['error'] = 'Please fill in all fields';
+        $_SESSION['error'] = 'Va rugam sa completati toate campurile';
         header('Location: firme-login-form.php');
         exit;
     }
@@ -34,19 +34,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
 
    
-    if (!$user || $password != $user['password']) {
-    // utilizatorul nu există în baza de date, afișează un mesaj de eroare și redirecționează către pagina de login
-    $_SESSION['error'] = 'Invalid email or password';
-    header('Location: firme-login-form.php');
-    exit;
-}
+    if (!$user) {
+        // utilizatorul nu exista
+        $_SESSION['error'] = 'Adresa de email nu exista in baza de date!';
+        header('Location: firme-login-form.php');
+        exit;
+    } elseif (!password_verify($password, $user['password'])) {
+        // utilizatorul există, dar parola este incorectă
+        $_SESSION['error'] = 'Parola introdusa este incorecta!';
+        
+        header('Location: firme-login-form.php');
+        exit;
+    } else {
+        //parola este corecta continua logarea     
 
     // autentificare cu succes, setează variabilele de sesiune și redirecționează către pagina de profil
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_type'] = 'firma'; // folosit pentru a seta dacă utilizatorul este firmă sau client
     $_SESSION['nume_firma'] =$user['nume_firma'];
-    header('Location: profil_firma.php?username=' . $user['nume_firma']);
+    header('Location: firme-dashboard.php?user_id=' . $user['id']);
     exit;
 }
-
+}

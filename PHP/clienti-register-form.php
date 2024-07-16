@@ -1,42 +1,20 @@
+﻿<?php
+
+session_start();
+?>
 
 
-<?php
-    // Inițializarea sesiunii
-session_start(); 
-    //verifică dacă utilizatorul este deja autentificat si daca este firma
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
-  //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
-  header('Location: firme-login-form.php');
-  exit;
-}
-    // Preluarea ID-ului firmei din URL
-    $firma_id = $_SESSION['user_id'];
-
-    // Conectarea la baza de date
-    $servername = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $dbname = "solarquery";
-
-    $conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-    // Verificarea conexiunii
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
- ?>
-
-
-
-<body>
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
-  <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="../CSS/adresa_styles.css">
+    <title>Înregistrare Clienti</title>
+    <link rel="stylesheet" href="../CSS/register_page.css">
+
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
+
 <header>
     <h1><a href="../index.php">SolarQuery</a></h1>
         <nav>
@@ -81,20 +59,21 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     <a href="../PHP/logout.php" class="logout-button">Logout</a>
   <?php endif; ?>
 <?php endif; ?>
-</div> 
+</div>      
               
 
         </nav>
 
     </header>
 
+
     <script>
     function fetchResults() {
         let query = document.getElementById('search-box').value;
-     // verifică dacă query-ul nu este gol
+     // verificăm dacă query-ul nu este gol
      if (query.trim() === '') {
         document.getElementById('search-results-container').innerHTML = ''; // Golește containerul de rezultate
-        return; // iesi din funcție dacă query-ul este gol
+        return; // Terminăm executarea funcției
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -122,91 +101,80 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     
 
     </script>
+    
+    <div class="container">
+        <h1>Formular inregistrare client</h1>
+        <form id="registerForm"  method="post">
+        
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Parolă:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmare_parola">Confirmare Parolă</label>
+                <input type="password" id="confirmare_parola" name="confirmare_parola" required>
+            </div>
+            <!-- <button type="submit" class="btn btn-primary">Trimite înregistrarea</button> -->
 
-<!-- Sidebar -->
-<div class="sidebar">
-<a href="firme-dashboard.php?user_id=<?php echo $firma_id; ?>" >
-    <h1>Dashboard</h1>
-  </a>
-    <ul>
-      <li><a href="firme_afisare_comenzi.php">Comenzi</a></li>
-       <li><a href="adaugare_date_furnizor.php">Informatii despre firma</a></li>
-       <li><a href="firme_adaugare_produs.php">Adaugare produse</a></li>
-       <li><a href="firme_afisare_produse.php">Produse si servicii</a></li>
-       <li><a href="portofoliu_furnizor.php">Portofoliu furnizor</a></li>
-       <li><a href="firme_afisare_recenzii.php">Recenzii</a></li>
-       <li><a href="../CHAT/messenger.php">Messenger</a></li>
-       <li><a href="logout.php">Logout</a></li>
-       
-    </ul>
-  </div>
-
-  <div class="content">
-  <h1 style="font-size: 24px; font-weight: bold;"> <?php echo "Bun venit!Dashboard Furnizor"; ?> </h1>
-</div>
+            <div class="g-recaptcha" data-sitekey="6LeKjfcnAAAAAMrUlLDRKf6XhQFkr0lq_XkzGwbg"></div>
 
 
-  </div>
+            <button type="button" onclick="submitForm()" class="btn btn-primary">Trimite înregistrarea</button>
+
+
+        </form>
+    </div>
+
+
+    <div id="message"></div>
+
+    <script>
+        function submitForm() {
+    // obtinem datele din formular
+    const formData = new FormData(document.getElementById('registerForm'));
+
+    let recaptchaResponse = grecaptcha.getResponse();
+if (recaptchaResponse === '') {
+    alert('Please complete the reCAPTCHA verification.');
+    return;
+}
+formData.append('g-recaptcha-response', recaptchaResponse);
+
+
+    // folosim fetch API pentru a trimite datele catre server
+    fetch('clienti-register.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text()) 
+    .then(data => {
+        // actualizam mesajul de eroare
+        document.getElementById('message').innerText = data;
+
+        // resetam formularul
+        document.getElementById('registerForm').reset();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+    </script>
+
+
+
+
+<style>
+    #message {
+    text-align: center; /* Center the text horizontally */
+    margin-top: 20px;  /* Add some space between the form and the message */
+    color: red;        /* Make the text color red to indicate an error */
+    font-weight: bold; /* Bold the text for emphasis */
+}
+</style>
+
+
 </body>
 </html>
-
-
-<div class="content" >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

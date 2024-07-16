@@ -1,43 +1,13 @@
-
-
-<?php
-    // Inițializarea sesiunii
-session_start(); 
-    //verifică dacă utilizatorul este deja autentificat si daca este firma
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
-  //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
-  header('Location: firme-login-form.php');
-  exit;
-}
-    // Preluarea ID-ului firmei din URL
-    $firma_id = $_SESSION['user_id'];
-
-    // Conectarea la baza de date
-    $servername = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $dbname = "solarquery";
-
-    $conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-    // Verificarea conexiunii
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
- ?>
-
-
-
-<body>
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
-  <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="../CSS/adresa_styles.css">
+    <title>Înregistrare Furnizor</title>
+    <link rel="stylesheet" href="../CSS/register_page.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
-<body>
-<header>
+    <body>
+
+    <header>
     <h1><a href="../index.php">SolarQuery</a></h1>
         <nav>
             <ul>
@@ -81,20 +51,21 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     <a href="../PHP/logout.php" class="logout-button">Logout</a>
   <?php endif; ?>
 <?php endif; ?>
-</div> 
+</div>    
               
 
         </nav>
 
     </header>
 
+
     <script>
     function fetchResults() {
         let query = document.getElementById('search-box').value;
-     // verifică dacă query-ul nu este gol
+     // Check if the query is empty or not
      if (query.trim() === '') {
-        document.getElementById('search-results-container').innerHTML = ''; // Golește containerul de rezultate
-        return; // iesi din funcție dacă query-ul este gol
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -123,90 +94,70 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
 
     </script>
 
-<!-- Sidebar -->
-<div class="sidebar">
-<a href="firme-dashboard.php?user_id=<?php echo $firma_id; ?>" >
-    <h1>Dashboard</h1>
-  </a>
-    <ul>
-      <li><a href="firme_afisare_comenzi.php">Comenzi</a></li>
-       <li><a href="adaugare_date_furnizor.php">Informatii despre firma</a></li>
-       <li><a href="firme_adaugare_produs.php">Adaugare produse</a></li>
-       <li><a href="firme_afisare_produse.php">Produse si servicii</a></li>
-       <li><a href="portofoliu_furnizor.php">Portofoliu furnizor</a></li>
-       <li><a href="firme_afisare_recenzii.php">Recenzii</a></li>
-       <li><a href="../CHAT/messenger.php">Messenger</a></li>
-       <li><a href="logout.php">Logout</a></li>
-       
-    </ul>
-  </div>
 
-  <div class="content">
-  <h1 style="font-size: 24px; font-weight: bold;"> <?php echo "Bun venit!Dashboard Furnizor"; ?> </h1>
+<!-- formular inregistrare -->
+
+<div class="container">
+    <h1>Înregistrare Furnizor</h1>
+    <form action="../PHP/firme-register.php" method="post">
+    <div class="form-group">
+        <label for="nume_firma">Nume Firmă:</label>
+        <input type="text" id="nume_firma" name="nume_firma" required><br><br>
+    </div>
+
+        <div class="form-group">
+        <label for="persoana_de_contact">Persoană de contact:</label>
+        <input type="text" id="persoana_de_contact" name="persoana_de_contact" required><br><br>
+    </div>
+
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Parolă:</label>
+        <input type="password" id="password" name="password" required><br><br>
+    </div>
+
+    <div class="form-group">
+        <label for="confirmare_parola">Confirmare Parolă</label>
+        <input type="password" id="confirmare_parola" name="confirmare_parola" required><br><br>
+    </div>
+
+    <div class="form-group">
+        <label for="telefon">Telefon</label>
+        <input type="telefon" id="telefon" name="telefon" required><br><br>
+    </div>
+       
+    <div class="form-group">
+        <label for="zona">Zona:</label>
+        <input type="text" id="zona" name="zona" required><br><br>
+    </div>
+
+
+    <div class="g-recaptcha" data-sitekey="6LeKjfcnAAAAAMrUlLDRKf6XhQFkr0lq_XkzGwbg"></div>
+
+    <button type="submit" class="btn btn-primary"  onclick="return checkRecaptcha()">Trimite înregistrarea</button>
+
+    </form>
 </div>
 
+<script>
+  function checkRecaptcha() {
+  if (grecaptcha.getResponse().length == 0) {
+    alert("Vă rugăm să completați reCAPTCHA înainte de a continua.");
+    return false;
+  } else {
+    return true;
+  }
+}
+</script>
 
-  </div>
+
+
 </body>
 </html>
-
-
-<div class="content" >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

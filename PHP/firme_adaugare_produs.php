@@ -2,15 +2,18 @@
 
 
 
-<?php
+
+
+
+  <?php
     // Inițializarea sesiunii
-session_start(); 
+    session_start(); 
     //verifică dacă utilizatorul este deja autentificat si daca este firma
-if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
-  //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
-  header('Location: firme-login-form.php');
-  exit;
-}
+    if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
+      //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
+      header('Location: firme-login-form.php');
+      exit;
+    }
     // Preluarea ID-ului firmei din URL
     $firma_id = $_SESSION['user_id'];
 
@@ -26,7 +29,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
- ?>
+  ?>
+
 
 
 <!DOCTYPE html>
@@ -36,38 +40,134 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="../CSS/adresa_styles.css">
 </head>
+    <body>
+    <header>
+    <h1><a href="../index.php">SolarQuery</a></h1>
+        <nav>
+            <ul>
+                <li><a href="../index.php">Acasă</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Shop</a>
+                    <div class="dropdown-content">
+                        <a href="produse.php">Produse</a>
+                        <a href="servicii.php">Servicii</a>
+                    </div>
+                </li>
+                <li><a href="../despre_noi.php">Despre noi</a></li>
+                <li><a href="../contact.php">Contact</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Clienti</a>
+                    <div class="dropdown-content">
+                        <a href="clienti-register-form.php">Înregistrare</a>
+                        <a href="clienti-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Furnizori</a>
+                    <div class="dropdown-content">
+                        <a href="firme-register-form.php">Înregistrare</a>
+                        <a href="firme-login-form.php">Logare</a>
+                        
+                    </div>
+                </li>
+                <li class="button"><a href="../ADD_RECENZIE/adaugare_recenzie.php">Lasa o recenzie</a></li>
+                <li class="search-container">
+                    <!-- Formularul de căutare -->
+                    <form method="GET">
+                        <input type="text" class="search-box" id="search-box" name="termen_cautare" placeholder="Caută o firmă..." onkeyup="fetchResults()">
+                        <div id="search-results-container"></div>
+                    </form>
+                </li>
+                
+               
 
-<!-- Navbar -->
-<div class="navbar">
-  <h1>My Page</h1>
-</div>
+            </ul>
+           
+            <div>                 
+<?php if(isset($_SESSION['user_id'])): ?>
+  <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'client'): ?>
+    <a href="../PHP/profil_client.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php elseif (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'firma'): ?>  
+    <a href="../PHP/firme-dashboard.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php endif; ?>
+<?php endif; ?>
+</div>   
+              
+
+        </nav>
+
+    </header>
+
+    <script>
+    function fetchResults() {
+        let query = document.getElementById('search-box').value;
+     // Check if the query is empty or not
+     if (query.trim() === '') {
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
+    }
+        // Efectuăm un request AJAX către scriptul PHP
+        fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
+        .then(response => response.json())
+        .then(data => {
+            let resultsContainer = document.getElementById('search-results-container');
+            resultsContainer.innerHTML = ''; // Resetează containerul
+    
+            if (data.length > 0) {
+                data.forEach(firma => {
+                    let firmaDiv = document.createElement('div');
+                    let firmaLink = document.createElement('a');
+                    firmaLink.href = '../PHP/profil_firma_copy.php?id=' + firma.id;
+                    firmaLink.textContent = firma.nume_firma;
+    
+                    firmaDiv.appendChild(firmaLink);
+                    resultsContainer.appendChild(firmaDiv);
+                });
+            } else {
+                resultsContainer.innerHTML = 'Niciun rezultat găsit.';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+
+    </script>
+
+
 
 <!-- Sidebar -->
 <div class="sidebar">
 <a href="firme-dashboard.php?user_id=<?php echo $firma_id; ?>" >
     <h1>Dashboard</h1>
   </a>
-    <ul>
+  <ul>
       <li><a href="firme_afisare_comenzi.php">Comenzi</a></li>
-       <li><a href="adaugare_adresa_client.php">Adrese si date personale</a></li>
+       <li><a href="adaugare_date_furnizor.php">Informatii despre firma</a></li>
        <li><a href="firme_adaugare_produs.php">Adaugare produse</a></li>
-       <li><a href="firme-produse.php">Produse si servicii</a></li>
+       <li><a href="firme_afisare_produse.php">Produse si servicii</a></li>
+       <li><a href="portofoliu_furnizor.php">Portofoliu furnizor</a></li>
+       <li><a href="firme_afisare_recenzii.php">Recenzii</a></li>
+       
+
+       <li><a href="../CHAT/messenger.php">Messenger</a></li>
        <li><a href="logout.php">Logout</a></li>
        
     </ul>
   </div>
-<body>
   
 
 
 
 <div class="content">
-  <h1>Adăugare produs</h1>
+  <h1>Adăugare produse si servicii</h1>
 
   
   <form method="post" enctype="multipart/form-data">
     <label for="nume">Nume:</label>
-    <input type="text" name="nume" id="nume" required>
+    <input type="text" name="nume" id="nume" required style="width: 300px;">
     <br><br>
 
     <label for="pret">Preț:</label>
@@ -77,16 +177,26 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     <label for="categorie">Categorie:</label>
     <select name="categorie" id="categorie" required>
       <option value="">Selectați o categorie</option>
-      <option value="categoria1">Invertoare</option>
-      <option value="categoria2">Categoria 2</option>
-      <option value="categoria3">Categoria 2</option>
-      <!-- Adaug opțiunile pentru categorii aici -->
+      <option value="Invertoare">Invertoare</option>
+      <option value="Baterii-Acumulatori">Baterii-Acumulatori</option>
+      <option value="Sisteme">Sisteme</option>
+      <option value="Regulatoare solare">Regulatoare solare</option>
+      <option value="Accesorii">Accesorii</option>
+      <option value="Panouri">Panouri</option>
+      <option disabled>SERVICII: </option>
+      <option value="Servicii consultanta">Servicii consultanta</option>
+      <option value="servicii de montaj">servicii de montaj</option>
+      <option value="servicii de mentenanta">servicii de mentenanta</option>
+      
+
+
+      <!-- Adaug alte optiuni pentru categorii aici -->
     </select>
     <br><br>
 
     <label for="subcategorie">Subcategorie:</label>
     <select name="subcategorie" id="subcategorie" required>
-      <!-- The subcategories will be populated based on the category chosen -->
+      <!-- subcategoria va fi populata pe baza categoriei alese -->
     </select>
     <br><br>
 
@@ -94,18 +204,71 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     document.getElementById("categorie").addEventListener("change", function() {
     let subcategorie = document.getElementById("subcategorie");
     
-    // First, clear the previous subcategories
+    // șterge opțiunile existente din subcategorie
     subcategorie.innerHTML = '<option value="">Selectați o subcategorie</option>';
 
-    // Based on the category, populate the subcategories
+    // pe bază de categorie, adaugă opțiuni pentru subcategorie
     switch(this.value) {
-        case 'categoria1':
+        case 'Invertoare':
             subcategorie.innerHTML += '<option value="monofazate">monofazate</option>';
+            subcategorie.innerHTML += '<option value="trifazate">trifazate</option>';
+            subcategorie.innerHTML += '<option value="dc-dc">dc-dc</option>';
+            subcategorie.innerHTML += '<option value="Invertoare_Altele">altele</option>';
             break;
 
-        case 'categoria2':
-            subcategorie.innerHTML += '<option value="subcategoria3">Subcategoria 3</option>';
-            subcategorie.innerHTML += '<option value="subcategoria4">Subcategoria 4</option>';
+        case 'Baterii-Acumulatori':
+            subcategorie.innerHTML += '<option value="Acumulator cu acid">Acumulator cu acid</option>';
+            subcategorie.innerHTML += '<option value="Baterie Lithium">Baterie Lithium</option>';
+            subcategorie.innerHTML += '<option value="Baterie Gel">Baterie Gel</option>';
+            subcategorie.innerHTML += '<option value="Baterie_Altele">Altele</option>';
+
+            break;
+
+        case 'Sisteme':
+            subcategorie.innerHTML += '<option value="sistem fotovoltaic off grid">sistem fotovoltaic off grid</option>';
+            subcategorie.innerHTML += '<option value="sistem fotovoltaic on grid hibrid">sistem fotovoltaic on grid hibrid</option>';
+            subcategorie.innerHTML += '<option value="sistem fotovoltaic on grid">sistem fotovoltaic on grid</option>';
+            subcategorie.innerHTML += '<option value="Sisteme_Altele">Altele</option>';
+
+            break;
+
+         case 'Regulatoare solare':
+            subcategorie.innerHTML += '<option value="Controller MPPT">Controller MPPT</option>';
+            subcategorie.innerHTML += '<option value="Controller_Altele">Altele</option>';
+            
+            break;
+
+        case 'Accesorii':
+            subcategorie.innerHTML += '<option value="Accesorii montaj panouri">Accesorii montaj panouri</option>';
+            subcategorie.innerHTML += '<option value="Cabluri">Cabluri</option>';
+            subcategorie.innerHTML += '<option value="Accesorii_Altele">Altele</option>';
+            
+            break;
+        case 'Panouri':
+            subcategorie.innerHTML += '<option value="Monocristalin">Monocristalin</option>';
+            subcategorie.innerHTML += '<option value="Policristalin">Policristalin</option>';
+            subcategorie.innerHTML += '<option value="Panouri_Altele">Altele</option>';
+            
+            break;  
+         
+        case 'Servicii consultanta':
+            subcategorie.innerHTML += '<option value="servicii de consultanță și proiectare">servicii de consultanță și proiectare</option>';
+            subcategorie.innerHTML += '<option value="documentatie prosumator">documentatie prosumator</option>';
+            subcategorie.innerHTML += '<option value="Consultanta_Altele">Altele</option>';
+            
+            break;
+
+        case 'servicii de montaj':
+            subcategorie.innerHTML += '<option value="instalare sisteme">instalare sisteme</option>';
+            subcategorie.innerHTML += '<option value="modificare sisteme">modificare sisteme</option>';
+            subcategorie.innerHTML += '<option value="Montaj_Altele">Altele</option>';
+            
+            break;
+
+        case 'servicii de mentenanta':
+            subcategorie.innerHTML += '<option value="verificare sisteme">verificare sisteme</option>';
+            subcategorie.innerHTML += '<option value="Mentenanta_Altele">Altele</option>';
+            
             break;
 
         // Add more cases for additional categories
@@ -130,7 +293,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
   <input type="file" name="images[]" id="images" accept="image/*" multiple>
   <br><br>
 
-    <input type="submit" name="submit" value="Adăugare produs">
+    <input type="submit" name="submit" value="Adauga in baza de date">
   </form>
     </div>
 

@@ -1,17 +1,14 @@
-
-
 <?php
-    // Inițializarea sesiunii
-session_start(); 
-    //verifică dacă utilizatorul este deja autentificat si daca este firma
+session_start(); // Start the session
+//verifică dacă utilizatorul este deja autentificat si daca este firma
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
-  //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
-  header('Location: firme-login-form.php');
-  exit;
+    //  utilizatorul nu este autentificat, redirecționează către pagina de autentificare
+    header('Location: firme-login-form.php');
+    exit;
 }
     // Preluarea ID-ului firmei din URL
-    $firma_id = $_SESSION['user_id'];
-
+    $id_firma = $_SESSION['user_id'];
+    $numa_firma['nume_firma'] =$_SESSION['nume_firma'];
     // Conectarea la baza de date
     $servername = "localhost";
     $db_username = "root";
@@ -24,10 +21,29 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
- ?>
 
 
 
+    $recenzii_per_pagina = 10; // sau oricât dorești
+$pagina_curenta = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+$start = ($pagina_curenta - 1) * $recenzii_per_pagina;
+
+$stmt = $conn->prepare("SELECT * FROM tbl_recenzii WHERE id_firma = ? LIMIT ?, ?");
+$stmt->bind_param("iii", $id_firma, $start, $recenzii_per_pagina);
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+  if (isset($_GET['flagged']) && $_GET['flagged'] == 'true') {
+    echo '<script>alert("Recenzie raportata cu succes.");</script>';
+    unset($_GET['flagged']);
+  }
+
+
+
+    ?>
+
+    
 <body>
 <!DOCTYPE html>
 <html>
@@ -81,20 +97,20 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     <a href="../PHP/logout.php" class="logout-button">Logout</a>
   <?php endif; ?>
 <?php endif; ?>
-</div> 
+</div>      
               
 
         </nav>
 
     </header>
-
+<!-- script afisare firme -->
     <script>
     function fetchResults() {
         let query = document.getElementById('search-box').value;
-     // verifică dacă query-ul nu este gol
+     // verificam daca inputul este gol
      if (query.trim() === '') {
-        document.getElementById('search-results-container').innerHTML = ''; // Golește containerul de rezultate
-        return; // iesi din funcție dacă query-ul este gol
+        document.getElementById('search-results-container').innerHTML = ''; // eliminam continutul din container
+        return; // iesim din functie
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -123,90 +139,53 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
 
     </script>
 
+
+
 <!-- Sidebar -->
 <div class="sidebar">
-<a href="firme-dashboard.php?user_id=<?php echo $firma_id; ?>" >
+<a href="firme-dashboard.php" >
     <h1>Dashboard</h1>
   </a>
     <ul>
       <li><a href="firme_afisare_comenzi.php">Comenzi</a></li>
        <li><a href="adaugare_date_furnizor.php">Informatii despre firma</a></li>
        <li><a href="firme_adaugare_produs.php">Adaugare produse</a></li>
-       <li><a href="firme_afisare_produse.php">Produse si servicii</a></li>
+       <li><a href="firme_afiasare_produse.php">Produse si servicii</a></li>
        <li><a href="portofoliu_furnizor.php">Portofoliu furnizor</a></li>
-       <li><a href="firme_afisare_recenzii.php">Recenzii</a></li>
-       <li><a href="../CHAT/messenger.php">Messenger</a></li>
+         <li><a href="firme_afisare_recenzii.php">Recenzii</a></li>
+        <li><a href="../CHAT/messenger.php">Messenger</a></li>
        <li><a href="logout.php">Logout</a></li>
        
     </ul>
   </div>
 
+
+
   <div class="content">
-  <h1 style="font-size: 24px; font-weight: bold;"> <?php echo "Bun venit!Dashboard Furnizor"; ?> </h1>
-</div>
+
+  <h2>Recenzii</h2>
+  <?php
 
 
-  </div>
-</body>
-</html>
+while($row = $result->fetch_assoc()) {
+    echo "<a href='../ADD_RECENZIE/flag_review.php?id=" . $row['id'] . "'>Raporteaza aceasta recenzie  </a>";
+
+    echo "Nume client: " . $row['nume_client'] . "<br>";
+     
+     if ($row['flagged'] == 1) {
+        echo "<strong>RAPORTAT</strong><br>";
+    }
+
+    echo "Descriere: " . $row['descriere'] . "<hr>";
+    
+
+    echo "<hr>";
+
+}
+if ($pagina_curenta > 1) {
+    echo "<a href='firme_afisare_recenzii.php?pagina=" . ($pagina_curenta - 1) . "'>Prev</a> ";
+}
+echo "<a href='firme_afisare_recenzii.php?pagina=" . ($pagina_curenta + 1) . "'>Next</a>";
 
 
-<div class="content" >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+?>

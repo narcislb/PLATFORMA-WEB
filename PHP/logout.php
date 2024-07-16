@@ -1,20 +1,20 @@
 <?php
 session_start(); // Start the session
 
-// Unset all of the session variables
+// deseteaza toate variabilele de sesiune
 $_SESSION = array();
 
-// Finally, destroy the session
+// distruge sesiunea
 session_destroy();
 
 
-// Redirect to the appropriate login page
+// redirectioneaza catre pagina corespunzatoare
 if ($_SESSION['user_type'] == 'client') {
     header("Location: client-login-form.php");
 } else if ($_SESSION['user_type'] == 'firma') {
     header("Location: firme-login-form.php");
 } else {
-    header("Location: ../index.html");
+    header("Location: ../index.php");
 }
 exit;
 ?>

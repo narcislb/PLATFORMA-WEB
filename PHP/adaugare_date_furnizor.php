@@ -1,5 +1,3 @@
-
-
 <?php
     // Inițializarea sesiunii
 session_start(); 
@@ -10,25 +8,21 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
   exit;
 }
     // Preluarea ID-ului firmei din URL
-    $firma_id = $_SESSION['user_id'];
+    $id_firma = $_SESSION['user_id'];
+    
+
+
+
 
     // Conectarea la baza de date
     $servername = "localhost";
     $db_username = "root";
     $db_password = "";
     $dbname = "solarquery";
-
     $conn = new mysqli($servername, $db_username, $db_password, $dbname);
 
-    // Verificarea conexiunii
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
- ?>
+?>
 
-
-
-<body>
 <!DOCTYPE html>
 <html>
 <head>
@@ -68,7 +62,17 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
                     </div>
                 </li>
                 <li class="button"><a href="../ADD_RECENZIE/adaugare_recenzie.php">Lasa o recenzie</a></li>
-              
+                <li class="search-container">
+                    <!-- Formularul de căutare -->
+                    <form method="GET">
+                        <input type="text" class="search-box" id="search-box" name="termen_cautare" placeholder="Caută o firmă..." onkeyup="fetchResults()">
+                        <div id="search-results-container"></div>
+                    </form>
+                </li>
+                
+                
+
+
             </ul>
            
             <div>                 
@@ -81,7 +85,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     <a href="../PHP/logout.php" class="logout-button">Logout</a>
   <?php endif; ?>
 <?php endif; ?>
-</div> 
+</div>     
               
 
         </nav>
@@ -93,8 +97,8 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
         let query = document.getElementById('search-box').value;
      // verifică dacă query-ul nu este gol
      if (query.trim() === '') {
-        document.getElementById('search-results-container').innerHTML = ''; // Golește containerul de rezultate
-        return; // iesi din funcție dacă query-ul este gol
+        document.getElementById('search-results-container').innerHTML = ''; // curață containerul de rezultate
+        return; // Exit the function early
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -125,7 +129,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
 
 <!-- Sidebar -->
 <div class="sidebar">
-<a href="firme-dashboard.php?user_id=<?php echo $firma_id; ?>" >
+<a href="firme-dashboard.php" >
     <h1>Dashboard</h1>
   </a>
     <ul>
@@ -141,72 +145,47 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'firma') {
     </ul>
   </div>
 
-  <div class="content">
-  <h1 style="font-size: 24px; font-weight: bold;"> <?php echo "Bun venit!Dashboard Furnizor"; ?> </h1>
-</div>
-
-
-  </div>
-</body>
-</html>
-
-
-<div class="content" >
 
 
 
 
+<?php
+$sql = "SELECT nume_firma, persoana_de_contact, telefon, services, zona FROM tbl_firme WHERE id=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_firma);
+$stmt->execute();
+$result = $stmt->get_result();
+$firma = $result->fetch_assoc();
+?>
+
+<form method="post" >
+    Nume Firma: <input type="text" name="nume_firma" value="<?php echo $firma['nume_firma']; ?>"><br>
+    Persoana de Contact: <input type="text" name="persoana_de_contact" value="<?php echo $firma['persoana_de_contact']; ?>"><br>
+    Telefon: <input type="text" name="telefon" value="<?php echo $firma['telefon']; ?>"><br>
+    Servicii: <input type="text" name="services" value="<?php echo $firma['services']; ?>"><br>
+    Zona: <input type="text" name="zona" value="<?php echo $firma['zona']; ?>"><br>
+    <input type="submit" value="Actualizeaza">
+</form>
 
 
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nume_firma = $_POST['nume_firma'];
+    $persoana_de_contact = $_POST['persoana_de_contact'];
+    $telefon = $_POST['telefon'];
+    $services = $_POST['services'];
+    $zona = $_POST['zona'];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    $sql = "UPDATE tbl_firme SET nume_firma=?, persoana_de_contact=?, telefon=?, services=?, zona=? WHERE id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssssi", $nume_firma, $persoana_de_contact, $telefon, $services, $zona, $id_firma);
+    
+    if ($stmt->execute()) {
+        
+        echo '<div style="text-align: center;">Actualizat cu succes,Dati refresh la pagina!</div>';
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    
+}
+?>

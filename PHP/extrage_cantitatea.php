@@ -16,12 +16,12 @@ $response = ['success' => false];
 if (isset($_GET['productId'])) {
     $productId = $_GET['productId'];
     
-    // Query the database to retrieve the quantity of the product
+    // verifica daca produsul exista in baza de date
     $sql = "SELECT cantitate FROM tbl_produse WHERE id = $productId";
     $result = $conn->query($sql);
     
     if ($result->num_rows > 0) {
-        // Return the quantity of the product as a JSON response
+        // returneaza cantitatea  produsului in format json
         $row = $result->fetch_assoc();
         echo json_encode(array('success' => true, 'quantity' => $row['cantitate']));
     } 

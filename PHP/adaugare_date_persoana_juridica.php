@@ -1,17 +1,8 @@
 <?php
-
-session_start(); // pornește o sesiune
-
-// verifica daca utilizatorul este deja autentificat si daca este client
-if (!isset($_SESSION['username']) || $_SESSION['user_type'] !== 'client') {
-  header('Location: clienti-login-form.php');// utilizatorul nu este autentificat sau nu este client, redirecționează către pagina de logare
-  exit();
-}
-
-
-// preia datele despre utilizatorul curent
+// Start session and retrieve user data
+session_start();
 $username = $_SESSION['username'];
-$user_id= $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 
 
 // Conectarea la baza de date
@@ -27,16 +18,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Verifica daca user ul este autentificat
+if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'client') {
+  // Redirectionare catre pagina de logare daca nu este client sau nu este logat
+  header('Location: clienti-login-form.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+
+   exit;
+}
 ?>
 
+<!-- HTML structure -->
 
 
 
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Page</title>
-  <link rel="stylesheet" type="text/css" href="../CSS/clienti_comenzi.css">
+  <title>Date persoana juridica</title>
+  <link rel="stylesheet" type="text/css" href="../CSS/adaugare_date_juridica.css">
 </head>
 <body>
 <header>
@@ -79,7 +78,7 @@ if ($conn->connect_error) {
                 </li>
                 
                 <div class="cart-icon-container">
-                        <a href="cos-cumparaturi.php">
+                        <a href="../PHP/cos-cumparaturi.php">
                              <i class="fas fa-shopping-cart"></i> 
                                     <span class="cart-item-count">
                             <?php 
@@ -106,7 +105,7 @@ if ($conn->connect_error) {
     <a href="../PHP/logout.php" class="logout-button">Logout</a>
   <?php endif; ?>
 <?php endif; ?>
-</div>     
+</div>    
               
 
         </nav>
@@ -116,10 +115,10 @@ if ($conn->connect_error) {
     <script>
     function fetchResults() {
         let query = document.getElementById('search-box').value;
-     // verificăm dacă query-ul nu este gol
+     // Check if the query is empty or not
      if (query.trim() === '') {
-        document.getElementById('search-results-container').innerHTML = ''; // Golește containerul de rezultate
-        return; // Terminăm executarea funcției dacă query-ul este gol
+        document.getElementById('search-results-container').innerHTML = ''; // Clear any previous results
+        return; // Exit the function early
     }
         // Efectuăm un request AJAX către scriptul PHP
         fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
@@ -157,7 +156,7 @@ if ($conn->connect_error) {
       <li><a href="clienti_comenzi.php">Comenzi</a></li>
        <li><a href="adaugare_adresa_client.php">Adrese si date personale</a></li>
        <li><a href="adaugare_date_persoana_juridica.php">Date persoana juridica</a></li>
-        <li><a href="../CHAT/messenger.php">Messenger</a></li>
+       <li><a href="../CHAT/messenger.php">Messenger</a></li>
        <li><a href="logout.php">Logout</a></li>
        
     </ul>
@@ -167,121 +166,123 @@ if ($conn->connect_error) {
 
 
 
-    <!-- afiseaza comenzile           -->
+<!-- Content box -->
+<div class="content">
+  <h2>Date persoana juridica</h2>
+  
+  <?php
+  // Initialization
+  $nume_companie= $CUI= $NumarRegCom= $SediuSocial= "";
+
+
+
+  // Fetch data
+  $stmt = $conn->prepare('SELECT persoana_juridica_id FROM tbl_clienti WHERE id = ?');
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$clientData = $stmt->get_result();
+$clientDataArray = $clientData->fetch_assoc();
+
+$companyExists = false;
+$companyDataArray = null;
+
+if ($clientDataArray['persoana_juridica_id']) {
+    $stmt = $conn->prepare('SELECT * FROM tbl_date_persoana_juridica WHERE id = ?');
+    $stmt->bind_param('i', $clientDataArray['persoana_juridica_id']);
+    $stmt->execute();
+    $companyData = $stmt->get_result();
+    $companyDataArray = $companyData->fetch_assoc();
+    if ($companyDataArray) {
+        extract($companyDataArray);
+        $companyExists = true;
+    }
+}
+
+
+
+
+  //interogari precompilate
+
+  // Form submission logic
+  if (isset($_POST['submit'])) {
+    // ... Capture data from form ...
+    $nume_companie = $_POST['nume_companie'];
+    $CUI = $_POST['CUI'];
+    $NumarRegCom = $_POST['NumarRegCom'];
+    $SediuSocial = $_POST['SediuSocial'];
+   
+    if ($companyExists) {
+        // Update the existing data in tbl_date_persoana_juridica
+        $stmt = $conn->prepare('UPDATE tbl_date_persoana_juridica 
+                        SET nume_companie = ?, CUI = ?, NumarRegCom = ?, SediuSocial = ? 
+                        WHERE id = (SELECT persoana_juridica_id FROM tbl_clienti WHERE id = ?)');
+        $stmt->bind_param('ssssi', $nume_companie, $CUI, $NumarRegCom, $SediuSocial, $user_id);
+        $stmt->execute();
+        echo '<p>Datele au fost actualizate cu succes.</p>';
+    } else {
+        // Insert new data in tbl_date_persoana_juridica
+        $stmt = $conn->prepare('INSERT INTO tbl_date_persoana_juridica ( nume_companie, CUI, NumarRegCom, SediuSocial) VALUES ( ?, ?, ?, ?)');
+        $stmt->bind_param('siss', $nume_companie, $CUI, $NumarRegCom, $SediuSocial);
+        $stmt->execute();
+        
+        $last_id = $conn->insert_id;
+    
+        // Update the tbl_clienti with the $last_id
+        $updateStmt = $conn->prepare('UPDATE tbl_clienti SET persoana_juridica_id = ? WHERE id = ?');
+        $updateStmt->bind_param('ii', $last_id, $user_id);
+        if (!$updateStmt->execute()) {
+            die("Execution failed: " . $updateStmt->error);
+        }
+        echo '<p>Datele au fost adaugate cu succes.</p>';
+
+        // set persoana_juridica to true in tbl_clienti
+        $stmt = $conn->prepare('UPDATE tbl_clienti SET persoana_juridica = 1 WHERE id = ?');
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+    }
+}
+
+
+  
+ 
+
+  ?>
   
 
-    <h2 style='margin-left: 300px; margin-top: 95px;'>Comenzile mele:</h2>
-
     
-      <?php
-   // setarea valorilor implicite pentru sortare
-   $sortDirection = 'asc';
-   $currentSort = '';
+<form method="post">
+  <div>
+      <label for="nume_companie">Nume companie:</label>
+      <input type="text" name="nume_companie" id="nume_companie" value="<?php echo htmlspecialchars($nume_companie); ?>" required>
+    </div>
 
-   // daca este setat parametrul GET 'direction' si daca valoarea acestuia este 'asc' sau 'desc'
-   if (isset($_GET['direction']) && in_array($_GET['direction'], ['asc', 'desc'])) {
-       $sortDirection = $_GET['direction'];
-   }
+    <div>
+      <label for="CUI">CUI:</label>
+      <input type="text" name="CUI" id="CUI" value="<?php echo htmlspecialchars($CUI); ?>"    required>
+    </div>
 
-   if (isset($_GET['sort'])) { // daca este setat parametrul GET 'sort' se va trece la sortarea dupa coloana respectiva
-       $currentSort = $_GET['sort'];
-   }
+    <div>
+      <label for="NumarRegCom">Numărul de ordine din registrul comerţului</label>
+      <input type="text" name="NumarRegCom" id="NumarRegCom" value="<?php echo htmlspecialchars($NumarRegCom); ?>" required>
+    </div>
 
-   $sql = "SELECT * FROM tbl_comenzi WHERE id_client = '$user_id'";
+    <div>
+      <label for="adresa">Adresa sediu social:</label>
+      <input type="text" name="SediuSocial" id="SediuSocial" value="<?php echo htmlspecialchars($SediuSocial); ?>" required>
+    </div>
 
-   if ($currentSort) {
-       $sql .= " ORDER BY $currentSort $sortDirection";
-   }
-
-   $result = $conn->query($sql);
-?>
-
-
-
-<table style="margin-left: 300px;margin-top: 95px;">
-    <thead>
-        <tr>
-            <th><a href="?sort=id_comanda&direction=<?php echo ($currentSort === 'id_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">ID comanda</a></th>
-            <th><a href="?sort=data_comanda&direction=<?php echo ($currentSort === 'data_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Data comanda</a></th>
-            <th><a href="?sort=total_de_plata&direction=<?php echo ($currentSort === 'total_de_plata' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Total de plata (LEI)</a></th>
-            <th><a href="?sort=status_comanda&direction=<?php echo ($currentSort === 'status_comanda' && $sortDirection === 'asc') ? 'desc' : 'asc'; ?>">Status comanda</a></th>
-        </tr>
-    </thead>
-    <tbody>
-<?php
-   
-   if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        echo "<tr>";
-        echo "<td><a href='?order_id=" . $row["id_comanda"] . "'>" . $row["id_comanda"] . "</a></td>";
-
-        echo "<td>" . $row["data_comanda"] . "</td>";
-        echo "<td>" . $row["total_de_plata"] . "</td>";
-        echo "<td>" . $row["status_comanda"] . "</td>";
-        echo "</tr>";
-    }
-} else {
-    echo "<tr><td colspan='4'>Nu există comenzi.</td></tr>";
-}
-
-?>
-   </tbody>
-</table>
-
-<?php
-
-   if (isset($_GET['order_id'])) {
-    $orderId = $_GET['order_id'];
-// Această interogare preia detaliile comenzii și numele produselor asociate pentru un ID de comandă specific.
-// Se realizează o legătură între tabelul produselor din comandă și tabelul principal al produselor pe baza ID-ului produsului.
-$productsSql = "
-    SELECT tbl_produse_comanda.*, tbl_produse.nume_produs, tbl_firme.nume_firma
-    FROM tbl_produse_comanda 
-    JOIN tbl_produse ON tbl_produse_comanda.id_produs = tbl_produse.id 
-    JOIN tbl_firme ON tbl_produse.id_firma = tbl_firme.id
-    WHERE tbl_produse_comanda.id_comanda = ?";
+    <div>
+    <input type="submit" name="submit" value="<?= $companyExists ? 'Actualizeaza datele' : 'Adauga datele' ?>">
+ 
+    </div>
 
 
-    $stmt = $conn->prepare($productsSql);
-    $stmt->bind_param("i", $orderId);  // daca este string s, daca este int i
-    $stmt->execute();
-    $productsResult = $stmt->get_result();
-}
 
-
+    </form>
+</div>
 
    
 
-   if (isset($productsResult) && $productsResult->num_rows > 0) {
-    
-    echo "<h3 style='margin-left: 300px; margin-top: 95px;'>Produsele pentru comanda cu id ul: " . $orderId . "</h3>";
-    echo "<table style='margin-left: 300px; margin-top: 95px;'>";
-                
-    echo "<thead>";
-    echo "<tr><th>Id_produs</th><th>Nume furnizor</th><th>Nume produs</th><th>cantitate</th>...</tr>";  // Adjust columns to fit your database schema
-    echo "</thead>";
-    echo "<tbody>";
-    while($product = $productsResult->fetch_assoc()) {
-        echo "<tr>";
-        echo "<td>" . $product["id_produs"] . "</td>";
-        echo "<td>" . htmlspecialchars($product["nume_firma"], ENT_QUOTES, 'UTF-8') . "</td>";  // afiseaza numele furnizorului
-        echo "<td>" . htmlspecialchars($product["nume_produs"], ENT_QUOTES, 'UTF-8') . "</td>";  // Display the product name
-        echo "<td>" . $product["cantitate"] . "</td>";
-        // ... alte coloane din tabelul tbl_produse_comanda
-        echo "</tr>";
-    }
-    echo "</tbody>";
-    echo "</table>";
-}
+</body>
+</html>
 
-
-
-
-
-
-
-?>
-
-
-  </body>
-  </html>

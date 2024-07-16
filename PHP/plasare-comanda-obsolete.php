@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'client') {
     exit;
   }
   $username = $_SESSION['username'];
-// Check if the shopping cart is empty
+// verifică dacă utilizatorul este deja autentificat si daca este client
 if (empty($_SESSION['cos-cumparaturi'])) {
     echo 'Cosul de cumparaturi este gol!';
 } else {
@@ -22,7 +22,7 @@ if (empty($_SESSION['cos-cumparaturi'])) {
 
     $db = new PDO("mysql:host=$host;dbname=$dbname", $user, $db_password);
 
-    // Retrieve the products from the database based on the product ids in the shopping cart
+    // incarca produsele din cos din baza de date 
     $product_ids = array_keys($_SESSION['cos-cumparaturi']);
     $stmt = $db->prepare('SELECT p.*, i.nume_imagine AS imagine FROM tbl_produse p LEFT JOIN tbl_imagini i ON p.id = i.id_produs WHERE p.id IN (' . implode(',', $product_ids) . ')');
     $stmt->execute();
@@ -46,7 +46,7 @@ if (empty($_SESSION['cos-cumparaturi'])) {
     }
 }
 
-// Check if the user is logged in
+// verifică dacă utilizatorul este deja autentificat si daca este client
 if (isset($_SESSION['user_id'])) {
     // Retrieve the user's address from the database
     $user_id = $_SESSION['user_id'];
@@ -73,7 +73,7 @@ if (isset($_SESSION['user_id'])) {
     }
 
     else {
-        // Set the address fields to empty strings
+        // setea variabilele de sesiune cu valori goale
         $tara = '';
         $judet = '';
         $localitate = '';
@@ -155,7 +155,7 @@ if (isset($_POST['placeorder'])) {
         $total_price += $cantitate * $pret_produs;
     }
 
-    // Insert the order into the database
+    // insereaza comanda in baza de date
     $stmt = $db->prepare('INSERT INTO tbl_comenzi (id_client, data_comanda, id_adresa_livrare, status_comanda, metoda_plata, total_de_plata) VALUES (:id_client, NOW(), :id_adresa_livrare, "neprocesata", :metoda_plata, :total_de_plata)');
     $stmt->bindParam(':id_client', $user_id);
     $stmt->bindParam(':id_adresa_livrare', $id_adresa);
@@ -164,7 +164,7 @@ if (isset($_POST['placeorder'])) {
     $stmt->execute();
     $id_comanda = $db->lastInsertId();
 
-    // Insert the order items into the database
+    // insereaza produsele comenzii respective in baza de date 
     foreach ($products as $product) {
         $id_produs = $product['id'];
         $cantitate = $_SESSION['cos-cumparaturi'][$id_produs];
@@ -177,7 +177,7 @@ if (isset($_POST['placeorder'])) {
         $stmt->execute();
     }
 
-    // Redirect to the order confirmation page
+    // redirectioneaza catre pagina de confirmare a comenzii
     //header('Location: confirmare-comanda.php?id=' . $order_id);
     exit;
 }
