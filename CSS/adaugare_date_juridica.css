@@ -1,6 +1,6 @@
 
-
 @import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
+
 label {
     display: block;
     margin-bottom: 0.5rem;
@@ -116,7 +116,7 @@ form button {
 form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: normal;
     width: 50%;
     margin: 0 auto;
 }
@@ -378,7 +378,7 @@ body {
   
   table {
     border-collapse: collapse;
-    /* width: 100%; */
+    width: 100%;
     margin-bottom: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
@@ -398,25 +398,43 @@ body {
     padding: 0.5rem;
   }
 
-  .cart-icon-container {
-    position: relative;
-    display: inline-block;
-    margin-right: 20px;
-  }
-  
-  .cart-item-count {
-    position: absolute;
-    top: -5px; 
-    right: -10px;
-    background-color: red;
-    color: white;
-    padding: 2px 5px;
-    border-radius: 50%; 
-    font-size: 12px;
+  form > div {
+    display: flex;
+    justify-content: space-between; /* Spreads the label and input apart */
+    align-items: center;            /* Vertically center align items */
+    margin-bottom: 20px;            /* Optional: gives */
   }
 
 
-  #suggestions div:hover {
-    cursor: pointer;
+  .form-container {
+    display: flex;           /* Enable flex */
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
+    height: 100vh;     
+    justify-content: space-between      /* Use full viewport height */
 }
 
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.cart-item-count {
+  position: absolute;
+  top: -5px; 
+  right: -10px;
+  background-color: red;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 50%; 
+  font-size: 12px;
+}
+
+
+/* Style for the input fields */
+#nume_companie, #CUI, #NumarRegCom, #SediuSocial {
+  width: 80%; 
+  padding: 10px 15px; 
+  font-size: 16px; 
+}

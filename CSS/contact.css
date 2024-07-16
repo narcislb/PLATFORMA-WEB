@@ -1,4 +1,4 @@
-﻿@import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
+@import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
 
 
 header {
@@ -38,7 +38,7 @@ main {
     max-width: 960px;
     margin: 2rem auto;
     text-align: center;
-    margin-bottom: 500px; /* Adjust this value as needed */
+    /* margin-bottom: 600px; Adjust this value as needed */
 
     
 }
@@ -145,8 +145,8 @@ body {
     position: absolute;
     top:10%; /* Position it right below the search box */
     right: 0;   /* Align it to the right of the search box's container */
-    width: 250px;  
-    z-index: 10;  /* Plaseaza peste alte elemente */
+    width: 250px;  /* Adjust width as needed */
+    z-index: 10;  /* Place it above other content */
     background-color: #121111;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
@@ -172,3 +172,79 @@ body {
     font-size: 12px;
   }
 
+
+  .account-button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 12px 24px; /* Some padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it a block element */
+    font-size: 16px; /* Increase font size */
+    margin-right: 10px; /* Add some margin to the right */
+  }
+  
+  .logout-button {
+    background-color: #f44336; /* Red background */
+    border: none; /* Remove border */
+    color: white; /* White text */
+    padding: 12px 24px; /* Some padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it a block element */
+    font-size: 16px; /* Increase font size */
+  }
+
+
+
+
+
+  /* General styling for the email assistance section */
+.email-assistance {
+    background-color: #f7f7f7; /* Light grey background for contrast */
+    padding: 20px; /* Space inside the box */
+    border-radius: 5px; /* Rounded corners */
+    margin: 20px 0; /* Space outside the box (top and bottom) */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.email-assistance h2 {
+    font-size: 1.8em; /* Slightly larger font for section title */
+    margin-bottom: 15px; /* Space below the title */
+}
+
+.email-assistance p {
+    margin-bottom: 10px; /* Space below paragraphs */
+    font-size: 1.1em; /* Slightly larger font for better readability */
+}
+
+.email-category {
+    margin-bottom: 20px; /* Space between each email category */
+}
+
+.email-category h3 {
+    font-size: 1.5em; /* Size for category titles */
+    color: #333; /* Dark grey color for headings */
+    margin-bottom: 10px; /* Space below the category title */
+}
+
+.email-category a {
+    color: #007c7a; /* Turquoise color to match the theme provided earlier */
+    text-decoration: none; /* Removes the underline */
+}
+
+.email-category a:hover {
+    text-decoration: underline; /* Underline on hover for better UX */
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-wrapper {
+    flex: 1 0 auto; /* This allows the content-wrapper to expand and occupy all available space */
+}

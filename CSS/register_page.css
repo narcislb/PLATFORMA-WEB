@@ -1,26 +1,57 @@
-
-
 @import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
-label {
-    display: block;
-    margin-bottom: 0.5rem;
+
+body {
+    font-family: sans-serif;
+    background-color: #3a424b;
+  }
+  
+  .container {
+    width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+  }
+  
+  h1 {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  label {
+    font-size: 14px;
     font-weight: bold;
-}
-
-
-
-
-input[type="submit"] {
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .btn {
     background-color: #007bff;
     color: #fff;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.25rem;
-    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-}
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+  }
+  
 
 
+
+  
 header {
     background-color: #333;
     color: #fff;
@@ -28,171 +59,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
-}
-
-
-nav ul {
-    display: flex;
-    list-style-type: none;
-}
-
-nav li {
-    margin: 0 0.5rem;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-}
-
-main {
-    max-width: 960px;
-    margin: 2rem auto;
-    text-align: center;
-}
-
-button {
-    background-color: #ff6a00;
-    color: #fff;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-}
-
-form button {
-    margin-top: 20px;
-    
-}
-
-    button:hover {
-        background-color: #666;
-    }
-.dropdown {
-    position: relative;
-    display: inline-block;
-    margin: 0 0.5rem;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    z-index: 1;
-    background-color: white;
-    color: black;
-    min-width: 160px;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.dropbtn {
-    font-size: 16px;
-    border: none;
-    outline: none;
-    color: white;
-    padding: 14px 16px;
-    background-color: inherit;
-    font-family: inherit;
-    margin: 0;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-    .dropdown-content a:hover {
-        background-color: black;
-        color: white;
-        
-    }
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 50%;
-    margin: 0 auto;
-}
-
-label {
-    margin-bottom: 10px;
-}
-
-input[type="submit"] {
-    margin-top: 10px;
-}
-
-.navbar {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-}
-
-body {
-    display: block;
-    margin: 8px;
-}
-
-#search-results-container div {
-    margin-bottom: 10px;
-    
-}
-
-#search-results-container {
-    position: absolute;
-    top:50%; /* Position it right below the search box */
-    right: 0;   /* Align it to the right of the search box's container */
-    width: 250px;  /* Adjust width as needed */
-    z-index: 10;  /* Place it above other content */
-    background-color: #121111;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    overflow: auto;
-    max-height: 400px;
-}
-
-
-
-
-/* style.css */
-.result-item {
-    margin-bottom: 10px;
-    
-}
-
-.account-button {
-    background-color: #4CAF50; /* Green background */
-    border: none; /* Remove border */
-    color: white; /* White text */
-    padding: 12px 24px; /* Some padding */
-    text-align: center; /* Center text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Make it a block element */
-    font-size: 16px; /* Increase font size */
-    margin-right: 10px; /* Add some margin to the right */
   }
-  
-  .logout-button {
-    background-color: #f44336; /* Red background */
-    border: none; /* Remove border */
-    color: white; /* White text */
-    padding: 12px 24px; /* Some padding */
-    text-align: center; /* Center text */
-    text-decoration: none; /* Remove underline */
-    display: inline-block; /* Make it a block element */
-    font-size: 16px; /* Increase font size */
-  }
-
-
-
-
   
   
   nav ul {
@@ -276,7 +143,14 @@ body {
         
     }
   
- 
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    margin: 0 auto;
+  }
+  
   label {
     margin-bottom: 10px;
   }
@@ -296,7 +170,9 @@ body {
     margin: 8px;
   }
   
-  
+  #search-results-container div {
+    margin-bottom: 10px;
+  }
   
   /* style.css */
   .result-item {
@@ -378,7 +254,7 @@ body {
   
   table {
     border-collapse: collapse;
-    /* width: 100%; */
+    width: 100%;
     margin-bottom: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
@@ -397,7 +273,20 @@ body {
   td {
     padding: 0.5rem;
   }
-
+  
+  #search-results-container {
+    position: absolute;
+    top:10%; /* Position it right below the search box */
+    right: 0;   /* Align it to the right of the search box's container */
+    width: 250px;  /* Adjust width as needed */
+    z-index: 10;  /* Place it above other content */
+    background-color: #121111;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 400px;
+  }
+  
   .cart-icon-container {
     position: relative;
     display: inline-block;
@@ -414,9 +303,3 @@ body {
     border-radius: 50%; 
     font-size: 12px;
   }
-
-
-  #suggestions div:hover {
-    cursor: pointer;
-}
-

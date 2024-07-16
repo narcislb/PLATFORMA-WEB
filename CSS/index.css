@@ -1,0 +1,74 @@
+/* General Layout and Styles */
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar Styles */
+
+.nav-wrapper {
+    background-color: #333;
+}
+
+.nav-wrapper .brand-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.nav-wrapper a:hover {
+    background-color: transparent;
+}
+
+/* Dropdown Styles */
+
+.dropdown-content {
+    background-color: #555;
+}
+
+.dropdown-content li>a {
+    color: #fff;
+}
+
+.dropdown-content li>a:hover {
+    background-color: #444;
+}
+
+/* Main Content */
+
+main {
+    padding: 50px 0;
+    text-align: center;
+}
+
+/* Footer Styles */
+
+.page-footer {
+    background-color: #333;
+}
+
+.page-footer p {
+    color: #fff;
+    margin: 0;
+    padding: 10px 0;
+}
+
+/* Button Styles */
+
+.btn {
+    background-color: #f57c00;
+}
+
+.btn:hover {
+    background-color: #ff9800;
+}
+
+/* You can continue refining and adding more styles as per your requirement. */

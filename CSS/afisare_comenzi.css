@@ -378,7 +378,7 @@ body {
   
   table {
     border-collapse: collapse;
-    /* width: 100%; */
+    width: 50%;
     margin-bottom: 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
@@ -397,6 +397,14 @@ body {
   td {
     padding: 0.5rem;
   }
+
+  th:nth-child(1), td:nth-child(1) { width: 150px; }
+th:nth-child(2), td:nth-child(2) { width: 150px; }
+th:nth-child(3), td:nth-child(3) { width: 150px; }
+th:nth-child(4), td:nth-child(4) { width: 150px; }
+th:nth-child(5), td:nth-child(5) { width: 150px; }
+/* ... and so on for each column ... */
+
 
   .cart-icon-container {
     position: relative;
@@ -420,3 +428,17 @@ body {
     cursor: pointer;
 }
 
+td a {
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center; /* center the text horizontally */
+  vertical-align: middle; /* center the text vertically */
+  /* text-decoration: none; remove underline from links */
+  color: inherit; /* make link have same color as normal text */
+  padding: 10px; /* add some padding around the text for better UX */
+}
+
+td a:hover, td:hover a { 
+  background-color: lightseagreen !important; 
+}

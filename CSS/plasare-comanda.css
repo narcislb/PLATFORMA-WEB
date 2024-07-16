@@ -1,6 +1,9 @@
 
+
+
 @import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
 /* General Resets and Basic Styles */
+
 
 body, html {
     margin: 0;
@@ -16,6 +19,7 @@ a {
 /* Navbar */
 
 .navbar {
+  
     background-color: #333;
     color: #fff;
     display: flex;
@@ -27,6 +31,7 @@ a {
 /* Header and Navigation */
 
 header {
+  
     background-color: #333;
     color: #fff;
     padding: 1rem;
@@ -123,6 +128,7 @@ header {
     align-items: center;
     width: 50%;
     margin: 0 auto;
+    
   }
   
   label {
@@ -131,6 +137,12 @@ header {
   
   input[type="submit"] {
     margin-top: 10px;
+    background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
   }
   
   .navbar {
@@ -161,19 +173,25 @@ header {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
-.produs img {
+/* .img {
     max-width: 200px;
     max-height: 200px;
     display: block;
     margin: auto;
     object-fit: cover; 
     border-radius: 5px;   /* Optional: to give images a rounded edge */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);  /* Optional: to give images a slight shadow */
+    /* box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);  Optional: to give images a slight shadow */
+    /* padding-left: 0;
+    margin-left: -90px; 
+} */ 
+
+
+
+.img {
+
+  padding-left: 0;
+  margin-left: -90px; 
 }
-
-
-
-
 
 
 
@@ -343,6 +361,11 @@ button:hover {
     max-height: 400px; /* Adjust as needed */
 }
 
+td {
+  font-weight: bold;
+  
+}
+
 .cart-icon-container {
   position: relative;
   display: inline-block;
@@ -359,3 +382,35 @@ button:hover {
   border-radius: 50%; 
   font-size: 12px;
 }
+
+div.outer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+form > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.cart-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+  }
+  
+  .cart-item-count {
+    position: absolute;
+    top: -5px; 
+    right: -10px;
+    background-color: red;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 50%; 
+    font-size: 12px;
+  }
