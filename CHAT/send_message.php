@@ -16,8 +16,8 @@ $response = ["success" => false];
 if(isset($_POST['message']) && isset($_POST['conversatie_id'])) {
     $message = $_POST['message'];
     $conversatie_id = $_POST['conversatie_id'];
-    $sender_type = $_SESSION['user_type'] ;  // Or "firma", depending on the session or other logic.
-    $sender_id = $_SESSION['user_id'];  // Assuming you have a session with user_id.
+    $sender_type = $_SESSION['user_type'] ;  // sau firma
+    $sender_id = $_SESSION['user_id'];  // 
 
     $sql = "INSERT INTO tbl_mesaje (continut, id_conversatie, sender_type, sender_id) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);

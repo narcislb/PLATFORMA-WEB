@@ -1,6 +1,16 @@
 <?php
 session_start();
 
+
+if (!isset($_SESSION['user_type']) || ($_SESSION['user_type'] !== 'client' && $_SESSION['user_type'] !== 'firma')) {
+    echo "<script>alert('Va rugam sa va autentificati');</script>";
+    header('Location: ../index.php'); 
+    exit;
+}
+
+
+
+
 // Connect to the database
 $servername = "localhost";
 $db_username = "root";
@@ -23,6 +33,7 @@ if($user_type == 'client') {
         SELECT 
             c.id,
             c.timestamp,
+            c.subiect,
             a.nume AS nume_client,
             f.nume_firma AS nume_firma
         FROM 
@@ -38,6 +49,7 @@ if($user_type == 'client') {
         SELECT 
             c.id,
             c.timestamp,
+            c.subiect,
             a.nume AS nume_client,
             f.nume_firma AS nume_firma
         FROM 
@@ -60,7 +72,9 @@ $stmt->execute();
 <html>
 <head>
     <title>Platforma SolarQuery</title>
-    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/messenger.css">
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
 
 
@@ -68,37 +82,38 @@ $stmt->execute();
 </head>
 
 <body>
-    <header>
-        <h1>Platforma SolarQuery</h1>
+<header>
+    <h1><a href="../index.php">SolarQuery</a></h1>
         <nav>
             <ul>
-                <li><a href="#">Acasă</a></li>
+                <li><a href="../index.php">Acasă</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropbtn">Shop</a>
                     <div class="dropdown-content">
-                        <a href="../HTML/produse.html">Produse</a>
-                        <a href="../HTML/servicii.html">Servicii</a>
+                        <a href="../PHP/produse.php">Produse</a>
+                        <a href="../php/servicii.php">Servicii</a>
                     </div>
                 </li>
-                <li><a href="#">Despre noi</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="../despre_noi.php">Despre noi</a></li>
+                <li><a href="../contact.php">Contact</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropbtn">Clienti</a>
                     <div class="dropdown-content">
-                        <a href="../HTML/clienti-register.html">Înregistrare</a>
-                        <a href="../PHP/clienti-login-form.php">Logare</a>
-                        <a href="../PHP/profil_client.php">Contul meu</a>
+                        <a href="../php/clienti-register-form.php">Înregistrare</a>
+                        <a href="../php/clienti-login-form.php">Logare</a>
+                        
                     </div>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropbtn">Firme</a>
+                    <a href="#" class="dropbtn">Furnizori</a>
                     <div class="dropdown-content">
-                        <a href="..HTML/firme-register.html">Înregistrare</a>
-                        <a href="..PHP/firme-login-form.php">Logare</a>
-                        <a href="../PHP/firme-dashboard.html">Contul meu</a>
+                        <a href="../php/firme-register-form.php">Înregistrare</a>
+                        <a href="../php/firme-login-form.php">Logare</a>
+                        
                     </div>
                 </li>
                 <li class="button"><a href="../ADD_RECENZIE/adaugare_recenzie.php">Lasa o recenzie</a></li>
+                
                 <li class="search-container">
                     <!-- Formularul de căutare -->
                     <form method="GET">
@@ -108,6 +123,21 @@ $stmt->execute();
                 </li>
                 
             </ul>
+
+            <div>                 
+<?php if(isset($_SESSION['user_id'])): ?>
+  <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'client'): ?>
+    <a href="../PHP/profil_client.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php elseif (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'firma'): ?>  
+    <a href="../PHP/firme-dashboard.php" class="account-button">My Account</a>
+    <a href="../PHP/logout.php" class="logout-button">Logout</a>
+  <?php endif; ?>
+<?php endif; ?>
+</div>
+
+
+
         </nav>
   
         
@@ -120,7 +150,7 @@ $stmt->execute();
         <strong>Incepe o noua conversatie:</strong>
         <div class="search-container">
             <form method="GET">
-                <input type="text" class="search-box" id="search-box-2" name="termen_cautare" placeholder="Caută..." onkeyup="fetchResults_simple()">
+                <input type="text" class="search-box" id="search-box-2" name="termen_cautare" placeholder="Caută firma dupa nume..." onkeyup="fetchResults_simple()">
                 <div id="search-results-container-2"></div>
             </form>
         </div>
@@ -129,7 +159,13 @@ $stmt->execute();
     <form id="startChatForm">
         <input type="hidden" id="selectedFirmaId" name="id_firma">
 
-        <textarea id="initialMessage" placeholder="Scrie mesajul tău aici..."></textarea>
+        <input type="text" id="subject" placeholder="Subiectul mesajului..." required>
+
+        <textarea id="initialMessage" placeholder="Scrie mesajul tău aici..." required></textarea>
+
+
+        <div class="g-recaptcha" data-sitekey="6LeKjfcnAAAAAMrUlLDRKf6XhQFkr0lq_XkzGwbg"></div>
+
         <button type="button" onclick="startChat()">Trimite mesaj</button>
         <div id="messageStatus"></div>
     </form>
@@ -192,18 +228,18 @@ function fetchResults_simple() {
 
     let query = document.getElementById('search-box-2').value;
 
-    // Check if the query is empty or not
+    // verificam daca query-ul este gol sau nu
     if (query.trim() === '') {
-        document.getElementById('search-results-container-2').innerHTML = ''; // Clear any previous results
-        return; // Exit the function early
+        document.getElementById('search-results-container-2').innerHTML = ''; // eliminam rezultatele anterioare
+        return; // iese din functie
     }
     
-    // Make an AJAX request to the PHP script
+    // face request la scriptul php 
     fetch('../ADD_RECENZIE/cauta_firma.php?query=' + query)
     .then(response => response.json())
     .then(data => {
         let resultsContainer = document.getElementById('search-results-container-2');
-        resultsContainer.innerHTML = ''; // Reset the container
+        resultsContainer.innerHTML = ''; // reseteaza containerul
 
         if (data.length > 0) {
             data.forEach(firma => {
@@ -211,9 +247,10 @@ function fetchResults_simple() {
                 
                 firmaDiv.textContent = firma.nume_firma;
                 
-                // On click, populate the search bar with the firm's name and hide the results
+                // la click pe o firma, se seteaza id-ul firmei in input-ul ascuns
                 firmaDiv.onclick = function() {
                     document.getElementById('search-box-2').value = firma.nume_firma;
+                    document.getElementById('selectedFirmaId').value = firma.id;  
                     resultsContainer.innerHTML = ''; 
                  };
                 
@@ -234,6 +271,7 @@ let userId = <?php echo $_SESSION['user_id']; ?>;
 
 
 <script>
+    // functia care trimite mesajul initial
 function startChat() {
     let firmaId = document.getElementById('selectedFirmaId').value;
     if (!firmaId) {
@@ -242,16 +280,30 @@ function startChat() {
     }
     
     let formData = new FormData();
-    formData.append('id_firma', firmaId); // Use the updated variable
+    formData.append('id_firma', firmaId); // folosim id-ul firmei selectate
     
     let message = document.getElementById('initialMessage').value;
     if (message.trim() === '') {
         document.getElementById('messageStatus').textContent = 'Mesajul nu poate fi gol.';
         return;
     }
-    
+
+    let subject = document.getElementById('subject').value;
+    if (subject.trim() === '') {
+        document.getElementById('messageStatus').textContent = 'Subiectul nu poate fi gol.';
+        return;
+    }
+
+    formData.append('subiect', subject);
     formData.append('id_client', <?php echo $_SESSION['user_id']; ?>);
     formData.append('message', message);
+
+    let recaptchaResponse = grecaptcha.getResponse();
+if (recaptchaResponse === '') {
+    alert('Please complete the reCAPTCHA verification.');
+    return;
+}
+formData.append('g-recaptcha-response', recaptchaResponse);
 
     fetch('../CHAT/send_initial_message.php', {
         method: 'POST',
@@ -261,7 +313,8 @@ function startChat() {
     .then(data => {
         if (data.success) {
             document.getElementById('messageStatus').textContent = 'Mesaj trimis cu succes!';
-            document.getElementById('initialMessage').value = ''; // Clear the textarea
+            document.getElementById('initialMessage').value = ''; // curata mesajul
+            document.getElementById('subject').value = '';  // curata subiectul
         } else {
             document.getElementById('messageStatus').textContent = 'Eroare la trimiterea mesajului.Daca nu sunteti autentificat va rugam sa va autentificati';
         }
@@ -271,6 +324,11 @@ function startChat() {
         document.getElementById('messageStatus').textContent = 'Eroare la trimiterea mesajului. Încercați din nou.';
     });
 }
+
+
+
+
+
 </script>
 
 
@@ -289,8 +347,15 @@ function startChat() {
 </style>
 
 
-    <footer>
-        <p>© 2023 SolarQuery. Toate drepturile rezervate.</p>
+<footer>
+
+
+<a href="https://ec.europa.eu/consumers/odr/main/index.cfm?event=main.home2.show&lng=RO">
+        <img src="../IMAGES/extra/anpc-sal.webp" alt="Image Description"  />
+    </a >
+
+        <p>&copy;  2023 Platforma SolarQuery</p>
+    </footer>
 
 
 

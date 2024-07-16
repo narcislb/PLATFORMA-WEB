@@ -17,9 +17,9 @@ $response = ['success' => false];
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if user is authenticated and is a client
+    // verifica daca userul e logat si este client
     if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] != 'client') {
-        // User is not authenticated or is not a client, return an error message
+        // eroare
         $response = array('success' => false, 'message' => 'Nu sunteti autentificat sau nu sunteti client.');
         echo json_encode($response);
         exit;
@@ -29,31 +29,34 @@ if(isset($_POST['id_firma'], $_POST['id_client'], $_POST['message'])) {
     $id_firma = $_POST['id_firma'];
     $id_client = $_POST['id_client'];
     $message = $_POST['message'];
+    $subiect = $_POST['subiect'];
+
     $user_type = $_SESSION['user_type'];
+
 
 $conn->begin_transaction();
 
 try {
-    // First, check if there's already a conversation
-    $sql = "SELECT id FROM tbl_conversatii WHERE id_client = ? AND id_firma = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $id_client, $id_firma);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $conversatie_id = null;
-    if($row = $result->fetch_assoc()) {
-        $conversatie_id = $row['id'];
+   // mai intai verificam daca exista o conversatie intre client si firma
+$sql = "SELECT id FROM tbl_conversatii WHERE subiect = ? AND id_client = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("si", $subiect, $id_client); // leaga parametrii de interogare pentru a preveni SQL injection
+$stmt->execute();
+$result = $stmt->get_result();
+$conversatie_id = null;
+if($row = $result->fetch_assoc()) {
+    $conversatie_id = $row['id'];
     } else {
-        // If not, create a new conversation
-        $sql = "INSERT INTO tbl_conversatii (id_client, id_firma) VALUES (?, ?)";
+        // daca nu exista conversatie, o cream
+        $sql = "INSERT INTO tbl_conversatii (id_client, id_firma, subiect) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $id_client, $id_firma);
+        $stmt->bind_param("iis", $id_client, $id_firma, $subiect);
         if($stmt->execute()) {
             $conversatie_id = $conn->insert_id;
         }
     }
 
-    // Insert the message
+    // daca exista conversatie, inseram mesajul in baza de date
     if ($conversatie_id) {
         // insereaza mesajul in baza de date
         $sql = "INSERT INTO tbl_mesaje (id_conversatie, sender_type ,sender_id , continut) VALUES (?, ?, ?, ?)";
@@ -65,10 +68,10 @@ try {
         $response['success'] = true;
     }
 
-    $conn->commit(); // If we reached here, everything worked. Commit changes.
+    $conn->commit(); // daca am ajuns aici, inseamna ca totul a mers bine, deci facem commit la schimbari
 
 } catch (Exception $e) {
-    $conn->rollback(); // If any operation failed, rollback all changes.
+    $conn->rollback(); // daca a aparut o eroare, facem rollback la schimbari
     $response['message'] = $e->getMessage();
 }
 }
