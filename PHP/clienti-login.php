@@ -12,7 +12,7 @@ $user = 'root';
 $db_password = '';
 
 $db = new PDO("mysql:host=$host;dbname=$dbname", $user, $db_password);
-$recaptchaSecret = '6LeKjfcnAAAAAAR6hej6kvQ9kyH3kcbsP-Gbn4mp';
+$recaptchaSecret = 'de completat';
 $recaptchaResponse = $_POST['g-recaptcha-response'];
 
 $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$recaptchaSecret&response=$recaptchaResponse");
